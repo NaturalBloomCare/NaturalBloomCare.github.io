@@ -850,7 +850,7 @@ footer a:hover{color:var(--bone)}
 
 <!-- 1 · HERO + BOOK -->
 <section class="hero">
-  <div class="hero-bg hero-ivory" aria-hidden="true"></div>
+  <div class="hero-bg hero-ivory" aria-hidden="true"><video class="hero-video" src="assets/bloom-bg.mp4" poster="assets/bloom-bg-poster.jpg" autoplay muted playsinline preload="auto" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video><img class="hero-video-still" src="assets/bloom-bg-end.jpg" alt="" aria-hidden="true"></div>
   <div class="hero-veil" aria-hidden="true"></div>
   <div class="wrap hero-inner hero-full">
     <div class="reveal">
@@ -1420,6 +1420,25 @@ const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.targ
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 setTimeout(()=>document.querySelectorAll('.reveal').forEach(el=>el.classList.add('in')),2500);
 route();
+</script>
+<style>
+.hero-bg .hero-video,.hero-bg .hero-video-still{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:right center;z-index:0;pointer-events:none;user-select:none}
+.hero-bg .hero-video-still{display:none}
+.hero-bg.video-still .hero-video{display:none}.hero-bg.video-still .hero-video-still{display:block}
+.hero-video::-webkit-media-controls,.hero-video::-webkit-media-controls-start-playback-button,.hero-video::-webkit-media-controls-panel,.hero-video::-webkit-media-controls-overlay-play-button,.hero-video::-webkit-media-controls-play-button{display:none!important;-webkit-appearance:none;opacity:0!important}
+@media (prefers-reduced-motion:reduce){.hero-bg .hero-video{display:none}.hero-bg .hero-video-still{display:block}}
+</style>
+<script>
+(function(){var v=document.querySelector('.hero-video');if(!v)return;var w=v.parentNode,done=false;
+function still(){w.classList.add('video-still');try{v.pause()}catch(e){}}
+if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){v.removeAttribute('autoplay');v.preload='none';still();return}
+v.muted=true;v.loop=false;v.controls=false;
+v.addEventListener('ended',function(){done=true;v.pause();try{v.currentTime=Math.max(0,v.duration-0.05)}catch(e){}});
+v.addEventListener('play',function(){if(done){v.pause()}});
+v.addEventListener('pause',function(){if(!done&&!v.ended&&!w.classList.contains('video-still')){var p=v.play();if(p&&p.catch)p.catch(still)}});
+v.addEventListener('error',still);
+var p=v.play();if(p&&p.catch)p.catch(still);
+})();
 </script>
 </body>
 </html>
