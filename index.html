@@ -1426,6 +1426,13 @@ route();
 .hero-bg .hero-video-still{display:none}
 .hero-bg.video-still .hero-video{display:none}.hero-bg.video-still .hero-video-still{display:block}
 .hero-video::-webkit-media-controls,.hero-video::-webkit-media-controls-start-playback-button,.hero-video::-webkit-media-controls-panel,.hero-video::-webkit-media-controls-overlay-play-button,.hero-video::-webkit-media-controls-play-button{display:none!important;-webkit-appearance:none;opacity:0!important}
+.hero-bg .hero-video,.hero-bg .hero-video-still{z-index:2;filter:none;opacity:1;mix-blend-mode:normal}
+.hero-bg:has(.hero-video)::before{display:none!important}
+.hero-bg:has(.hero-video)::after{display:block!important;z-index:3;background:linear-gradient(90deg,var(--bone) 0%,rgba(245,240,232,.7) 22%,rgba(245,240,232,0) 36%)!important}
+@media (max-width:768px){.hero-bg:has(.hero-video)::after{display:none!important}}
+@media (max-width:768px){.hero{overflow:hidden}.hero-bg{overflow:hidden}
+.hero-bg .hero-video,.hero-bg .hero-video-still{inset:auto;top:auto;bottom:0;left:-150px;width:780px;max-width:none;height:auto;aspect-ratio:1332/690;object-fit:cover;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 22%);mask-image:linear-gradient(180deg,transparent 0,#000 22%)}}
+@media (min-width:769px){.hero-bg.v-aligned .hero-video,.hero-bg.v-aligned .hero-video-still{inset:auto;top:0;left:var(--vx);width:var(--vw);height:100%;max-width:none;object-fit:cover;object-position:center;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18%);mask-image:linear-gradient(90deg,transparent 0,#000 18%)}}
 @media (prefers-reduced-motion:reduce){.hero-bg .hero-video{display:none}.hero-bg .hero-video-still{display:block}}
 </style>
 <script>
@@ -1439,6 +1446,11 @@ v.addEventListener('pause',function(){if(!done&&!v.ended&&!w.classList.contains(
 v.addEventListener('error',still);
 var p=v.play();if(p&&p.catch)p.catch(still);
 })();
+</script>
+<script>
+(function(){var b=document.querySelector('.hero-bg');var ic=document.querySelectorAll('.trust-bar > div')[3];if(!b||!ic)return;var P=0.63,A=1332/690;
+function al(){if(innerWidth<=768){b.classList.remove('v-aligned');return}var r=b.getBoundingClientRect(),s=(ic.querySelector('svg')||ic).getBoundingClientRect();var h=r.height,w=Math.max(h*A,r.width*0.6);var cx=s.left+s.width/2-r.left;var x=cx-P*w;if(x+w<r.width)w=Math.max(w,(r.width-cx)/(1-P)),h=w/A,x=cx-P*w;b.style.setProperty('--vw',w+'px');b.style.setProperty('--vx',x+'px');b.classList.add('v-aligned')}
+al();addEventListener('resize',al);addEventListener('load',al);})();
 </script>
 </body>
 </html>
