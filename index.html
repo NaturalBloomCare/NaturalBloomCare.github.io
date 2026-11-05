@@ -855,7 +855,7 @@ footer a:hover{color:var(--bone)}
 <main id="view-home" class="view">
 
 <!-- 1 · HERO + BOOK -->
-<section class="hero">
+<section class="hero"><div class="hero-stage">
   <div class="hero-bg hero-ivory" aria-hidden="true"><video class="hero-video" src="assets/bloom-bg.mp4" poster="assets/bloom-bg-poster.jpg" autoplay muted playsinline preload="auto" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video><img class="hero-video-still" src="assets/bloom-bg-end.jpg" alt="" aria-hidden="true"></div>
   <div class="hero-veil" aria-hidden="true"></div>
   <div class="wrap hero-inner hero-full">
@@ -869,7 +869,7 @@ footer a:hover{color:var(--bone)}
       </div>
     </div>
   </div>
-</section>
+ </div></section>
 
 <!-- 2 · TRUST INDICATORS -->
 <section class="trust">
@@ -1461,10 +1461,15 @@ route();
 .hero:has(.hero-video) .hero-veil{display:none!important}
 .hero-bg:has(.hero-video){background:#fcf8ef!important}
 .nav.on-hero:not(.dark)::before{opacity:0!important}
-@media (max-width:768px){.hero{overflow:hidden}.hero-bg{overflow:hidden}
+@media (max-width:768px){.hero{overflow:clip}.hero-bg{overflow:hidden}
 .hero-bg .hero-video,.hero-bg .hero-video-still{inset:auto;top:auto;bottom:0;left:-150px;width:780px;max-width:none;height:auto;aspect-ratio:1332/690;object-fit:cover}}
 @media (min-width:769px){.hero-bg.v-aligned .hero-video,.hero-bg.v-aligned .hero-video-still{inset:auto;top:0;left:var(--vx);width:var(--vw);height:100%;max-width:none;object-fit:cover;object-position:center}}
 @media (max-width:768px){.hero-bg.m-aligned .hero-video,.hero-bg.m-aligned .hero-video-still{inset:auto;top:var(--my);left:var(--mx);bottom:auto;width:var(--mw);height:auto;max-width:none}}
+.hero-stage{display:contents}
+@media (max-width:768px) and (prefers-reduced-motion:no-preference){
+.hero.two-stage{display:block;min-height:0;padding:0;height:calc(var(--sh,100svh) + var(--hd,70svh));overflow:clip;position:relative}
+.hero.two-stage .hero-stage{display:flex;align-items:center;position:sticky;top:0;height:var(--sh,100svh);overflow:hidden;padding:120px 0 90px;box-sizing:border-box}
+.hero.two-stage .hero-video,.hero.two-stage .hero-video-still{transform:translate3d(0,var(--ty,0px),0);will-change:transform}}
 @media (prefers-reduced-motion:reduce){.hero-bg .hero-video{display:none}.hero-bg .hero-video-still{display:block}}
 </style>
 <script>
@@ -1481,7 +1486,7 @@ var p=v.play();if(p&&p.catch)p.catch(still);
 </script>
 <script>
 (function(){var b=document.querySelector('.hero-bg');var ic=document.querySelectorAll('.trust-bar > div')[3];if(!b||!ic)return;var P=0.63,A=1332/690;
-function al(){if(innerWidth<=768){b.classList.remove('v-aligned');var hh=document.querySelector('.hero h1');if(!hh)return;var r0=b.getBoundingClientRect(),t=hh.getBoundingClientRect().top-r0.top;var hb=document.querySelector('.hero a[href="#how"]'),bc=hb?(function(q){return q.top+q.height/2-r0.top})(hb.getBoundingClientRect()):r0.height-16;var H=Math.max(300,(bc-t)/0.714),W=H*A;b.style.setProperty('--mw',W+'px');b.style.setProperty('--mx',(r0.width-0.63*W)+'px');b.style.setProperty('--my',(t-0.186*H)+'px');b.classList.add('m-aligned');return}b.classList.remove('m-aligned');var r=b.getBoundingClientRect(),s=(ic.querySelector('svg')||ic).getBoundingClientRect();var h=r.height,w=Math.max(h*A,r.width*0.6);var cx=s.left+s.width/2-r.left;var x=cx-P*w;if(x+w<r.width)w=Math.max(w,(r.width-cx)/(1-P)),h=w/A,x=cx-P*w;b.style.setProperty('--vw',w+'px');b.style.setProperty('--vx',x+'px');b.classList.add('v-aligned')}
+function al(){if(innerWidth<=768){b.classList.remove('v-aligned');var hh=document.querySelector('.hero h1');if(!hh)return;var r0=b.getBoundingClientRect(),t=hh.getBoundingClientRect().top-r0.top;var hb=document.querySelector('.hero a[href="#how"]'),bc=hb?(function(q){return q.bottom-r0.top+20})(hb.getBoundingClientRect()):r0.height-16;var H=Math.max(300,(bc-t)/0.666),W=H*A;b.style.setProperty('--mw',W+'px');b.style.setProperty('--mx',(r0.width-0.63*W)+'px');b.style.setProperty('--my',(t-0.186*H)+'px');b.classList.add('m-aligned');return}b.classList.remove('m-aligned');var r=b.getBoundingClientRect(),s=(ic.querySelector('svg')||ic).getBoundingClientRect();var h=r.height,w=Math.max(h*A,r.width*0.6);var cx=s.left+s.width/2-r.left;var x=cx-P*w;if(x+w<r.width)w=Math.max(w,(r.width-cx)/(1-P)),h=w/A,x=cx-P*w;b.style.setProperty('--vw',w+'px');b.style.setProperty('--vx',x+'px');b.classList.add('v-aligned')}
 al();addEventListener('resize',al);addEventListener('load',function(){al();setTimeout(al,1200);setTimeout(al,2500)});})();
 </script>
 <script>
@@ -1492,6 +1497,17 @@ location.href='mailto:admin@naturalbloom.ca?subject='+encodeURIComponent('Waitli
 m.querySelector('.wl-form-wrap').hidden=true;m.querySelector('.wl-thanks').hidden=false;});
 document.querySelectorAll('[data-modal="waitlist"]').forEach(function(b){b.addEventListener('click',function(){f.reset();m.querySelector('.wl-form-wrap').hidden=false;m.querySelector('.wl-thanks').hidden=true;});});
 if(location.hash==='#waitlist')setTimeout(function(){openModal('waitlist')},0);
+})();
+</script>
+<script>
+(function(){var h=document.querySelector('.hero');if(!h||!h.querySelector('.hero-stage'))return;var b=h.querySelector('.hero-bg');
+var mq=matchMedia('(max-width:768px) and (prefers-reduced-motion:no-preference)'),lw=0,D=0,tick=false;
+function size(){if(!mq.matches){h.classList.remove('two-stage');b.style.removeProperty('--ty');return}
+if(innerWidth!==lw||!D){lw=innerWidth;var sh=innerHeight;D=Math.round(sh*0.7);h.style.setProperty('--sh',sh+'px');h.style.setProperty('--hd',D+'px')}
+h.classList.add('two-stage');upd()}
+function upd(){tick=false;if(!h.classList.contains('two-stage'))return;var y=Math.min(D,Math.max(0,-h.getBoundingClientRect().top));b.style.setProperty('--ty',(-y)+'px')}
+addEventListener('scroll',function(){if(!tick){tick=true;requestAnimationFrame(upd)}},{passive:true});
+addEventListener('resize',size);if(mq.addEventListener)mq.addEventListener('change',size);size();
 })();
 </script>
 </body>
