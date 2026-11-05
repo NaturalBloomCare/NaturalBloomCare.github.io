@@ -1457,11 +1457,13 @@ route();
 .hero-video::-webkit-media-controls,.hero-video::-webkit-media-controls-start-playback-button,.hero-video::-webkit-media-controls-panel,.hero-video::-webkit-media-controls-overlay-play-button,.hero-video::-webkit-media-controls-play-button{display:none!important;-webkit-appearance:none;opacity:0!important}
 .hero-bg .hero-video,.hero-bg .hero-video-still{z-index:2;filter:none;opacity:1;mix-blend-mode:normal}
 .hero-bg:has(.hero-video)::before{display:none!important}
-.hero-bg:has(.hero-video)::after{display:block!important;z-index:3;background:linear-gradient(90deg,var(--bone) 0%,rgba(245,240,232,.7) 22%,rgba(245,240,232,0) 36%)!important}
-@media (max-width:768px){.hero-bg:has(.hero-video)::after{display:none!important}}
+.hero-bg:has(.hero-video)::after{display:none!important}
+.hero:has(.hero-video) .hero-veil{display:none!important}
+.hero-bg:has(.hero-video){background:#fcf8ef!important}
+.nav.on-hero:not(.dark)::before{opacity:0!important}
 @media (max-width:768px){.hero{overflow:hidden}.hero-bg{overflow:hidden}
-.hero-bg .hero-video,.hero-bg .hero-video-still{inset:auto;top:auto;bottom:0;left:-150px;width:780px;max-width:none;height:auto;aspect-ratio:1332/690;object-fit:cover;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 22%);mask-image:linear-gradient(180deg,transparent 0,#000 22%)}}
-@media (min-width:769px){.hero-bg.v-aligned .hero-video,.hero-bg.v-aligned .hero-video-still{inset:auto;top:0;left:var(--vx);width:var(--vw);height:100%;max-width:none;object-fit:cover;object-position:center;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18%);mask-image:linear-gradient(90deg,transparent 0,#000 18%)}}
+.hero-bg .hero-video,.hero-bg .hero-video-still{inset:auto;top:auto;bottom:0;left:-150px;width:780px;max-width:none;height:auto;aspect-ratio:1332/690;object-fit:cover}}
+@media (min-width:769px){.hero-bg.v-aligned .hero-video,.hero-bg.v-aligned .hero-video-still{inset:auto;top:0;left:var(--vx);width:var(--vw);height:100%;max-width:none;object-fit:cover;object-position:center}}
 @media (prefers-reduced-motion:reduce){.hero-bg .hero-video{display:none}.hero-bg .hero-video-still{display:block}}
 </style>
 <script>
