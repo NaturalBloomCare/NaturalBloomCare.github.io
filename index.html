@@ -1470,6 +1470,8 @@ route();
 .hero.two-stage{display:block;min-height:0;padding:0;height:calc(var(--sh,100svh) + var(--hd,70svh));overflow:clip;position:relative}
 .hero.two-stage .hero-stage{display:flex;align-items:center;position:sticky;top:0;height:var(--sh,100svh);overflow:hidden;padding:120px 0 90px;box-sizing:border-box}
 .hero.two-stage .hero-video,.hero.two-stage .hero-video-still{opacity:var(--op,1);will-change:opacity}}
+@media (max-width:768px){.hero-bg .hero-video,.hero-bg .hero-video-still{transition:opacity .8s cubic-bezier(.16,1,.3,1)}.hero-bg.bg-faded .hero-video,.hero-bg.bg-faded .hero-video-still{opacity:0}}
+@media (max-width:768px) and (prefers-reduced-motion:reduce){.hero-bg .hero-video,.hero-bg .hero-video-still{transition:none}}
 @media (prefers-reduced-motion:reduce){.hero-bg .hero-video{display:none}.hero-bg .hero-video-still{display:block}}
 </style>
 <script>
@@ -1507,10 +1509,10 @@ function measure(){var hh=h.querySelector('h1'),hb=h.querySelector('a[href="#how
 var t=offTop(hh),bc=hb?offTop(hb)+hb.offsetHeight+20:b.offsetHeight-16;var H=Math.round(Math.max(300,(bc-t)/0.666)),W=Math.round(H*A),vw=b.offsetWidth;
 b.style.setProperty('--mw',W+'px');b.style.setProperty('--mh',H+'px');b.style.setProperty('--mx',Math.round(vw-0.63*W)+'px');b.style.setProperty('--my',Math.round(t-0.186*H)+'px');b.classList.add('m-aligned')}
 function setup(){if(innerWidth===lw)return;lw=innerWidth;
-if(!mob.matches){h.classList.remove('two-stage');b.classList.remove('m-aligned');b.style.removeProperty('--op');return}
-if(!rm.matches){var sh=innerHeight;D=Math.round(sh*0.7);h.style.setProperty('--sh',sh+'px');h.style.setProperty('--hd',D+'px');h.classList.add('two-stage')}else h.classList.remove('two-stage');
+if(!mob.matches){h.classList.remove('two-stage');b.classList.remove('m-aligned');b.classList.remove('bg-faded');return}
+h.classList.remove('two-stage');
 measure();upd()}
-function upd(){tick=false;if(!h.classList.contains('two-stage'))return;var y=Math.min(D,Math.max(0,-h.getBoundingClientRect().top));b.style.setProperty('--op',(1-y/D).toFixed(3))}
+function upd(){tick=false;b.classList.toggle('bg-faded',mob.matches&&scrollY>10)}
 addEventListener('scroll',function(){if(!tick){tick=true;requestAnimationFrame(upd)}},{passive:true});
 addEventListener('resize',setup);
 var go=function(){lw=-1;setup()};(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(go);
