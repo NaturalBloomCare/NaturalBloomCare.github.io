@@ -616,10 +616,16 @@ footer a:hover{color:var(--bone)}
 .avail-flat .dh-sep{color:var(--gold)}
 @media (max-width:1020px){.avail-flat .dayhours{white-space:normal;flex-wrap:wrap;gap:0 .45em}}
 @media (max-width:720px){.avail-flat .dayhours{min-height:0;font-size:1.4rem}}
-.avail-flat>div{display:flex;flex-direction:column}
-.avail-flat .dayhours{min-height:0;margin-top:auto;padding-top:14px;padding-bottom:0;line-height:1.15}
-@media (max-width:720px){.avail-flat .dayhours{margin-top:4px;padding-top:0}}
-@media (min-width:721px){.avail-flat .dayhours{margin-bottom:7px}}
+.avail-flat>div{display:flex;flex-direction:column;align-items:stretch}
+.avail-flat>div:not(:first-child){justify-content:flex-start}
+@media (min-width:721px){
+  .avail-flat>div:first-child{justify-content:center}
+  .avail-flat .dayhours{min-height:0;margin:0;padding:0;line-height:1.15;align-items:center}
+}
+@media (max-width:720px){
+  .avail-flat>div:first-child{justify-content:flex-start}
+  .avail-flat .dayhours{min-height:0;margin-top:4px;padding-top:0;line-height:1.15}
+}
 @media (max-width:720px){.avail-flat .dh-sep{display:none}.avail-flat .dayhours{flex-direction:column;align-items:flex-start;gap:2px}}
 .t-bloom{position:absolute;top:22px;right:24px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:var(--gold);box-shadow:inset 2px 2px 6px var(--sd),inset -2px -2px 6px var(--sl)}
 .t-bloom svg{width:20px;height:20px}
@@ -961,8 +967,8 @@ footer a:hover{color:var(--bone)}
 
     <div class="avail-flat reveal">
       <div><strong>Availability</strong><p class="dayhours"><span>Monday to Friday</span><span class="dh-sep">·</span><span>8:00 am – 8:00 pm</span></p></div>
-      <div><strong>Insurance</strong><p>Our clinic does not offer direct billing for visits or services. Our partner pharmacy can direct bill your insurance for prescribed medications and supplies, and can check your coverage for you.</p></div>
-      <div><strong>Cancellations &amp; rescheduling</strong><p>Need to cancel or reschedule? Let us know at least 24 hours before your appointment and you'll receive a full refund, or we'll happily move you to a new time. Cancellations or changes made within 24 hours of your appointment, and missed appointments, are charged the full visit fee.</p></div>
+      <div><strong>Insurance</strong><p>We don't offer direct billing for visits or services. Our partner pharmacy can direct bill your insurance for prescribed medications and supplies, and check your coverage.</p></div>
+      <div><strong>Cancellations &amp; rescheduling</strong><p>Cancel or reschedule at least 24 hours ahead for a full refund or a new time. Changes within 24 hours, and missed appointments, are charged the full visit fee.</p></div>
     </div>
   </div>
 </section>
