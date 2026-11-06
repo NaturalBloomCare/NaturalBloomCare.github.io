@@ -835,6 +835,9 @@ footer a:hover{color:var(--bone)}
 #modal-waitlist .m-form select,#modal-waitlist .m-form textarea{font-family:var(--sans);font-size:.95rem;font-weight:300;color:var(--ink);background:var(--bone);border:0;border-radius:16px;padding:15px 18px;box-shadow:inset 4px 4px 10px var(--sd),inset -4px -4px 10px var(--sl);outline:none;letter-spacing:.02em;text-transform:none;resize:vertical;-webkit-appearance:none;appearance:none}
 #modal-waitlist .m-form select:focus,#modal-waitlist .m-form textarea:focus{box-shadow:inset 4px 4px 10px var(--sd),inset -4px -4px 10px var(--sl),0 0 0 1px var(--gold)}
 #modal-waitlist .modal{padding-top:34px}#modal-waitlist .m-ic{width:48px;height:48px;margin-bottom:12px}#modal-waitlist .m-form{gap:10px}#modal-waitlist .m-form input,#modal-waitlist .m-form select,#modal-waitlist .m-form textarea{padding:12px 16px}#modal-waitlist .m-sub{margin:8px 0 18px}
+.wl-status{font-size:.86rem;line-height:1.45;margin:0;color:var(--ink-soft)}
+.wl-status-error{color:var(--burgundy)}
+#wl-form button[disabled]{opacity:.65;cursor:progress}
 .wl-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.wl-row input{min-width:0;width:100%}
 @media (max-width:420px){.wl-row{grid-template-columns:1fr}}
 /* library card title links */
@@ -1440,7 +1443,8 @@ footer a:hover{color:var(--bone)}
       <label>Email<input type="email" name="email" required autocomplete="email" placeholder="you@example.com"></label>
       <label>Phone (optional)<input type="tel" name="phone" autocomplete="tel"></label>
       <label>I'm interested in<select name="interest" required><option value="" disabled selected>Choose one</option><option>Nurse Practitioner visit</option><option>Herbalist &amp; Nutrition visit</option><option>Integrated visit</option><option>Not sure</option></select></label>
-      <label>Note (optional)<textarea name="note" rows="2"></textarea></label>
+      <label>Note (optional)<textarea name="note" rows="2" maxlength="500" placeholder="Timing or how to reach you. Please leave out health details."></textarea></label>
+      <p class="wl-status" id="wl-status" role="status" aria-live="polite" hidden></p>
       <button class="btn btn-solid" type="submit">Join waitlist</button>
     </form>
     </div>
@@ -1558,13 +1562,78 @@ route();
 })();
 </script>
 <script>
-(function(){var f=document.getElementById('wl-form');if(!f)return;var m=document.getElementById('modal-waitlist');
-f.addEventListener('submit',function(e){e.preventDefault();var d=new FormData(f);
-var body='Waitlist request\n\nName: '+d.get('first')+' '+d.get('last')+'\nEmail: '+d.get('email')+'\nPhone: '+(d.get('phone')||'-')+'\nInterested in: '+d.get('interest')+'\nNote: '+(d.get('note')||'-');
-location.href='mailto:admin@naturalbloom.ca?subject='+encodeURIComponent('Waitlist: '+d.get('first')+' '+d.get('last'))+'&body='+encodeURIComponent(body);
-m.querySelector('.wl-form-wrap').hidden=true;m.querySelector('.wl-thanks').hidden=false;});
-document.querySelectorAll('[data-modal="waitlist"]').forEach(function(b){b.addEventListener('click',function(){f.reset();m.querySelector('.wl-form-wrap').hidden=false;m.querySelector('.wl-thanks').hidden=true;});});
-if(location.hash==='#waitlist')setTimeout(function(){openModal('waitlist')},0);
+(function(){
+  var f=document.getElementById('wl-form');if(!f)return;
+  var m=document.getElementById('modal-waitlist');
+  var wrap=m.querySelector('.wl-form-wrap');
+  var thanks=m.querySelector('.wl-thanks');
+  var status=document.getElementById('wl-status');
+  var btn=f.querySelector('button[type="submit"]');
+  var btnLabel=btn.textContent;
+  var sending=false;
+  /* Apps Script web app. POST urlencoded fields only — a custom Content-Type or JSON would preflight.
+     The script answers with a 302 that already allows cross-origin reads; fetch follows it as GET and the body is plain text: "ok" or "Missing required fields". */
+  var ENDPOINT='https://script.google.com/macros/s/AKfycbyiZEHiLj-BUTWMh6oO29BT9c3PE16K7FsrYa3yQtlTYjsGlUIRsVT9-WgQR4ke5AJAzA/exec';
+  function setStatus(kind,text){
+    status.hidden=false;
+    status.className='wl-status'+(kind?' wl-status-'+kind:'');
+    status.textContent=text;
+  }
+  function showForm(){
+    if(sending)return;
+    f.reset();
+    btn.disabled=false;
+    btn.textContent=btnLabel;
+    status.hidden=true;
+    status.textContent='';
+    status.className='wl-status';
+    wrap.hidden=false;
+    thanks.hidden=true;
+  }
+  f.addEventListener('submit',function(e){
+    e.preventDefault();
+    if(sending)return;
+    var d=new FormData(f);
+    function val(name){return String(d.get(name)||'').trim();}
+    var first=val('first'),last=val('last'),email=val('email'),phone=val('phone'),interest=val('interest'),note=val('note');
+    if(!first||!last||!email||!interest){
+      setStatus('error','Please add your first name, last name, email, and what you’re interested in.');
+      return;
+    }
+    sending=true;
+    btn.disabled=true;
+    btn.textContent='Sending…';
+    setStatus('pending','Sending your request…');
+    var body=new URLSearchParams({first:first,last:last,email:email,phone:phone,interest:interest,note:note});
+    fetch(ENDPOINT,{method:'POST',body:body,redirect:'follow'}).then(function(res){
+      return res.text().then(function(text){return {status:res.status,text:String(text||'').replace(/^\uFEFF/,'').trim()};});
+    }).then(function(r){
+      if(r.text==='ok'){
+        sending=false;
+        wrap.hidden=true;
+        thanks.hidden=false;
+        status.hidden=true;
+        return;
+      }
+      sending=false;
+      btn.disabled=false;
+      btn.textContent=btnLabel;
+      if(r.text==='Missing required fields'){
+        setStatus('error','Please add your first name, last name, email, and what you’re interested in.');
+      }else{
+        setStatus('error','We couldn’t confirm your request was saved. Please try again, or email hello@naturalbloom.ca.');
+      }
+    }).catch(function(){
+      sending=false;
+      btn.disabled=false;
+      btn.textContent=btnLabel;
+      setStatus('error','We couldn’t confirm your request was saved. It may not have reached the list. Please try again, or email hello@naturalbloom.ca.');
+    });
+  });
+  document.querySelectorAll('[data-modal="waitlist"]').forEach(function(b){
+    b.addEventListener('click',showForm);
+  });
+  if(location.hash==='#waitlist')setTimeout(function(){showForm();openModal('waitlist');},0);
 })();
 </script>
 
