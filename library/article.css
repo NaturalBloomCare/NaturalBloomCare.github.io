@@ -61,10 +61,6 @@ h2 em,h1 em{font-style:italic;color:var(--burgundy)}
 .hero-fig{margin:8px 0 52px}
 .hero-fig img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:26px;box-shadow:9px 9px 22px var(--sd),-9px -9px 22px var(--sl)}
 .hero-fig figcaption{font-size:.72rem;line-height:1.5;color:var(--muted);padding:12px 2px 0}
-.hero-fig figcaption a{color:var(--burgundy)}
-.photo-credit{font-size:.68rem;line-height:1.45;color:var(--muted);padding:0 22px 8px}
-.photo-credit a{color:var(--burgundy)}
-.rel-link{display:flex;flex-direction:column;flex:1;text-decoration:none;color:inherit}
 
 .article-body{font-size:1.05rem;color:var(--ink-soft)}
 .article-body p{margin:0 0 1.15em}
