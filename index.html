@@ -581,7 +581,7 @@ footer a:hover{color:var(--bone)}
 @media (prefers-reduced-motion:reduce){.ph-dot svg{transition:none}.phase:hover .ph-dot svg{transform:none}}
 /* parallax band */
 .full-frame{position:relative;overflow:hidden;background:none}
-.ff-img{position:absolute;left:0;right:0;top:-22%;bottom:-22%;background-size:cover;background-position:center;will-change:transform}
+.ff-img{position:absolute;left:0;right:0;top:-22%;bottom:-22%;background-size:cover;background-position:center}
 /* availability aligned with neighbouring columns */
 .avail-flat .days{font-family:var(--sans);font-size:.9rem;line-height:1.7;color:var(--ink-soft)}
 .avail-flat .hours{font-family:var(--serif);font-size:clamp(1.7rem,2.2vw,2.1rem);line-height:1.2;margin-top:4px;color:var(--ink);white-space:nowrap}
@@ -786,8 +786,9 @@ footer a:hover{color:var(--bone)}
 .expect .ex-btn{align-self:center;margin-top:auto}
 .expect .ex-group:last-of-type{margin-bottom:22px}
 .expect{justify-content:flex-start}
-/* deep-window parallax: no zoom */
-.ff-img{top:0;bottom:auto;left:0;right:0;transform-origin:center;transition:none;background-position:center 30%}
+/* The photo fills its frame. A viewport-sized layer plus a subpixel translate
+   left the 1672px source scaled up and soft, including after scrolling stopped. */
+.ff-img{top:0;bottom:0;left:0;right:0;height:auto;transform:none;will-change:auto;transition:none;background-position:center 30%}
 .full-frame{box-shadow:inset 0 0 0 1px rgba(29,26,24,.05)}
 .full-frame::after{background:none;box-shadow:inset 0 46px 50px -30px rgba(29,26,24,.55),inset 0 -46px 50px -30px rgba(29,26,24,.55),inset 0 0 120px rgba(29,26,24,.18)}
 /* careers pop-up: no glow */
@@ -1478,18 +1479,6 @@ const gT=document.getElementById('gTrack');
 if(gT){const step=()=>gT.querySelector('.g-item').getBoundingClientRect().width+20;
 document.querySelector('.g-prev').addEventListener('click',()=>gT.scrollBy({left:-step(),behavior:'smooth'}));
 document.querySelector('.g-next').addEventListener('click',()=>gT.scrollBy({left:step(),behavior:'smooth'}));}
-const ff=document.querySelector('.full-frame'),ffi=ff&&ff.querySelector('.ff-img');
-const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-let ticking=false;
-function para(){ticking=false;if(!ffi)return;const r=ff.getBoundingClientRect();const vh=innerHeight;const H=r.height;
- if(H===0||r.bottom<-50||r.top>vh+50)return;
- if(reduce){ffi.style.height=H+'px';ffi.style.transform='none';return;}
- if(innerWidth>720){ /* deep window: image stays put while the page slides over it */
-  ffi.style.height=vh+'px';ffi.style.transform='translate3d(0,'+(-r.top).toFixed(1)+'px,0)';}
- else{ /* phones: gentler depth so the photo isn't over-cropped */
-  const ih=H*1.45;ffi.style.height=ih+'px';const q=Math.max(0,Math.min(1,(vh-r.top)/(vh+H)));
-  ffi.style.transform='translate3d(0,'+((H-ih)*(1-q)).toFixed(1)+'px,0)';}}
-addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(para)}},{passive:true});addEventListener('resize',para);para();
 /* simple page views */
 const VIEWS={'#legal':'view-legal','#privacy':'view-privacy','#library':'view-library','#booking':'view-booking'};
 function route(){const h=location.hash;const v=VIEWS[h]||'view-home';
@@ -1497,7 +1486,7 @@ function route(){const h=location.hash;const v=VIEWS[h]||'view-home';
  if(VIEWS[h]){window.scrollTo({top:0,behavior:'instant'});}
  else if(h&&h.length>1&&!document.getElementById('modal-'+h.slice(1))){const t=document.querySelector(h);if(t)requestAnimationFrame(()=>t.scrollIntoView());}
  document.querySelectorAll('.view:not([hidden]) .reveal').forEach(el=>el.classList.add('in'));
- navState();para();}
+ navState();}
 addEventListener('hashchange',route);
 document.querySelectorAll('[data-scroll]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth'});}));
 /* modals */
