@@ -141,6 +141,8 @@ footer{background:var(--ink);color:rgba(245,240,232,.7);padding:90px 0 40px;font
 .f2 .f-disc{margin-top:6px}
 .f-base{margin-top:40px;padding-top:26px;border-top:1px solid rgba(216,196,154,.2);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:.74rem;letter-spacing:.06em}
 .f2 .f-base{margin-top:28px}
+.f-base .oversight{flex:1 1 320px;max-width:560px;margin:0;letter-spacing:.02em;line-height:1.5;text-transform:none}
+.f-base .oversight b{display:block;margin-bottom:4px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;font-size:.66rem;color:var(--gold)}
 
 @media (max-width:1020px){
   .nav-links{display:none;position:absolute;top:86px;left:0;right:0;background:rgba(245,240,232,.96);backdrop-filter:blur(14px);flex-direction:column;gap:0;padding:10px 24px 24px;box-shadow:0 12px 24px rgba(170,158,138,.2)}
