@@ -855,6 +855,44 @@ footer a:hover{color:var(--bone)}
 .lib-grid h3 a:hover{color:var(--burgundy)}
 .lib-credits{font-size:.75rem;line-height:1.55;color:var(--muted);margin:22px 0 0;max-width:62rem}
 .lib-credits a{color:var(--burgundy)}
+/* library search and category filter */
+.lib-toolbar{position:relative;z-index:4;display:flex;align-items:flex-end;justify-content:space-between;gap:28px 48px;margin-bottom:48px}
+.lib-toolbar .page-head{margin-bottom:0;max-width:640px;flex:1 1 auto}
+.lib-tools{position:relative;display:flex;align-items:stretch;flex:0 1 440px;width:min(100%,440px);background:var(--bone);border-radius:18px;box-shadow:inset 4px 4px 10px var(--sd),inset -4px -4px 10px var(--sl)}
+.lib-tools:focus-within{box-shadow:inset 4px 4px 10px var(--sd),inset -4px -4px 10px var(--sl),0 0 0 1px var(--gold)}
+.lib-search{display:flex;align-items:center;gap:8px;flex:1 1 auto;min-width:0;padding-left:16px}
+.lib-search svg{width:16px;height:16px;flex:none;color:var(--muted)}
+.lib-search-input{flex:1;min-width:0;width:100%;border:0;background:transparent;font-family:var(--sans);font-weight:300;font-size:1rem;color:var(--ink);padding:14px 8px 14px 0;outline:none;letter-spacing:.01em}
+.lib-search-input::placeholder{color:var(--muted)}
+.lib-search-input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none;height:14px;width:14px;cursor:pointer;background:center / 14px 14px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%237a726a' stroke-width='1.4'%3E%3Cpath d='M4 4l8 8M12 4L4 12'/%3E%3C/svg%3E")}
+.lib-cat{position:relative;display:flex;flex:none}
+.lib-cat-btn{display:flex;align-items:center;gap:8px;border:0;border-left:1px solid rgba(216,196,154,.75);background:transparent;color:var(--ink);font-family:var(--sans);font-weight:400;font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;padding:0 16px;cursor:pointer;white-space:nowrap}
+.lib-cat-btn svg{width:12px;height:12px;color:var(--burgundy);transition:transform .25s ease}
+.lib-cat-btn[aria-expanded="true"] svg{transform:rotate(180deg)}
+.lib-cat-label{max-width:9.2rem;overflow:hidden;text-overflow:ellipsis}
+.lib-cat-panel{position:absolute;top:calc(100% + 10px);right:0;z-index:30;min-width:230px;padding:10px;background:var(--bone);border-radius:18px;box-shadow:9px 9px 22px var(--sd),-9px -9px 22px var(--sl)}
+.lib-cat-panel[hidden]{display:none !important}
+.lib-cat-all{border-bottom:1px solid rgba(216,196,154,.55);margin-bottom:6px;padding-bottom:6px}
+.lib-cat-panel label{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;font-size:.95rem;font-weight:300;color:var(--ink);cursor:pointer}
+.lib-cat-panel label:hover{background:rgba(216,196,154,.2)}
+.lib-cat-panel input{width:16px;height:16px;accent-color:var(--burgundy);flex:none}
+.lib-cat-btn:focus-visible,.lib-search-input:focus-visible,.lib-cat-panel label:focus-within{outline:2px solid var(--burgundy);outline-offset:2px;border-radius:8px}
+.lib-status{margin:0 0 28px;font-family:var(--serif);font-style:italic;font-size:1.45rem;line-height:1.35;color:var(--ink-soft);text-align:center}
+.lib-status[data-quiet]{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.lib-grid .res[hidden]{display:none !important}
+.lib-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media (max-width:860px){
+  .lib-toolbar{flex-direction:column;align-items:stretch;gap:22px}
+  .lib-toolbar .page-head{max-width:none}
+  .lib-tools{width:100%;flex-basis:auto}
+}
+@media (max-width:420px){
+  .lib-tools{flex-direction:column;border-radius:18px}
+  .lib-search{padding:4px 8px 0 14px}
+  .lib-cat-btn{border-left:0;border-top:1px solid rgba(216,196,154,.75);justify-content:space-between;padding:12px 14px}
+  .lib-cat-panel{left:0;right:0}
+}
+@media (prefers-reduced-motion:reduce){.lib-cat-btn svg{transition:none}}
 
 @media (max-width:720px){
   .pp-body h3{font-size:1.65rem;white-space:nowrap;overflow:hidden;text-overflow:clip}
@@ -1395,24 +1433,133 @@ footer a:hover{color:var(--bone)}
 <!-- ===== LIBRARY PAGE ===== -->
 <main id="view-library" class="view page-view" hidden>
   <div class="wrap">
-    <div class="page-head reveal">
-      <div class="eyebrow">Library</div>
-      <h1>The Bloom <em>library.</em></h1>
-      <p class="lede">Guides, recipes and everyday practices from our practitioners, written to help you understand your health and care for yourself well.</p>
+    <div class="lib-toolbar">
+      <div class="page-head reveal">
+        <div class="eyebrow">Library</div>
+        <h1>The Bloom <em>library.</em></h1>
+        <p class="lede">Guides, recipes and everyday practices from our practitioners, written to help you understand your health and care for yourself well.</p>
+      </div>
+      <form class="lib-tools" role="search" aria-label="Filter library articles">
+        <label class="lib-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16.5L20 20.5"/></svg>
+          <span class="lib-sr">Search articles by title or excerpt</span>
+          <input class="lib-search-input" type="search" placeholder="Search articles" autocomplete="off" enterkeyhint="search">
+        </label>
+        <div class="lib-cat">
+          <button type="button" class="lib-cat-btn" aria-haspopup="true" aria-expanded="false" aria-controls="lib-cat-panel">
+            <span class="lib-cat-label">All categories</span>
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M3.5 6L8 10.5 12.5 6"/></svg>
+          </button>
+          <div class="lib-cat-panel" id="lib-cat-panel" hidden>
+            <div class="lib-cat-all">
+              <label><input type="checkbox" data-all checked> All</label>
+            </div>
+            <div role="group" aria-label="Categories">
+              <label><input type="checkbox" data-cat value="Nutrition" checked> Nutrition</label>
+              <label><input type="checkbox" data-cat value="Wellness" checked> Wellness</label>
+              <label><input type="checkbox" data-cat value="Recipes" checked> Recipes</label>
+              <label><input type="checkbox" data-cat value="Your Visit" checked> Your Visit</label>
+              <label><input type="checkbox" data-cat value="Lab Results" checked> Lab Results</label>
+            </div>
+          </div>
+        </div>
+      </form>
     </div>
+    <p class="lib-status" id="lib-status" data-quiet aria-live="polite"></p>
     <!-- Illustrative AI-generated imagery for the six Library articles, cropped from 16:9 to 16:10. Not a photograph of a patient, a practitioner, or a laboratory result. -->
 <div class="lib-grid">
-      <article class="neo res reveal"><div class="res-img" role="img" aria-label="A cream living room and oak table, with an open notebook, a pen, and a laptop showing a Bloom screen titled Your visit with a burgundy flower, beside a lilac flower in a vase" style="background-image:url('library/images/what-to-expect-at-your-first-visit.jpg')"></div><div class="res-top"><span class="pill pill-lilac">Bloom</span><span class="small">6 min read</span></div><h3><a href="/library/what-to-expect-at-your-first-visit.html">What to expect at your first visit</a></h3><p class="small">How an integrated visit works, from booking to your written plan.</p><a class="link" href="/library/what-to-expect-at-your-first-visit.html">Read</a></article>
-      <article class="neo res reveal"><div class="res-img" role="img" aria-label="Three collection tubes a little under half full of dark red blood, with emerald, burgundy, and lilac caps, on ivory linen beside a pink flower and an amber bottle" style="background-image:url('library/images/understanding-your-blood-work.jpg')"></div><div class="res-top"><span class="pill pill-lilac">Guide</span><span class="small">7 min read</span></div><h3><a href="/library/understanding-your-blood-work.html">Understanding your blood work</a></h3><p class="small">What common lab markers measure, explained in plain language, plus questions to bring to your next visit. Your practitioner will always review your results with you.</p><a class="link" href="/library/understanding-your-blood-work.html">Read</a></article>
-      <article class="neo res reveal"><div class="res-img" role="img" aria-label="A ceramic cup of tea beside a closed book, a white flower and lilac petals on rumpled linen" style="background-image:url('library/images/an-evening-wind-down.jpg')"></div><div class="res-top"><span class="pill pill-lilac">Ritual</span><span class="small">6 min read</span></div><h3><a href="/library/an-evening-wind-down.html">An evening wind-down</a></h3><p class="small">A gentle routine for the hour before bed, from a warm cup of tea to screens off.</p><a class="link" href="/library/an-evening-wind-down.html">Read</a></article>
-      <article class="neo res reveal"><div class="res-img" role="img" aria-label="A plate of grains, roasted vegetables, leafy greens and orange segments on linen, with a white flower beside it" style="background-image:url('library/images/balanced-eating-made-simple.jpg')"></div><div class="res-top"><span class="pill pill-lilac">Nutrition</span><span class="small">6 min read</span></div><h3><a href="/library/balanced-eating-made-simple.html">Balanced eating, made simple</a></h3><p class="small">Easy ways to build balanced meals around foods you already enjoy.</p><a class="link" href="/library/balanced-eating-made-simple.html">Read</a></article>
-      <article class="neo res reveal"><div class="res-img" role="img" aria-label="A ceramic bowl of vegetable soup with a wooden spoon and a sprig of rosemary" style="background-image:url('library/images/warming-winter-soups.jpg')"></div><div class="res-top"><span class="pill pill-lilac">Recipe</span><span class="small">7 min read</span></div><h3><a href="/library/warming-winter-soups.html">Warming winter soups</a></h3><p class="small">Simple, comforting recipes for the colder months.</p><a class="link" href="/library/warming-winter-soups.html">Read</a></article>
-      <article class="neo res reveal"><div class="res-img" role="img" aria-label="A glass carafe and a glass of water on linen, with white and pink flowers" style="background-image:url('library/images/hydration-made-easy.jpg')"></div><div class="res-top"><span class="pill pill-lilac">Practice</span><span class="small">6 min read</span></div><h3><a href="/library/hydration-made-easy.html">Hydration, made easy</a></h3><p class="small">Small, everyday habits that make drinking water effortless.</p><a class="link" href="/library/hydration-made-easy.html">Read</a></article>
+      <article class="neo res reveal" data-category="Your Visit"><div class="res-img" role="img" aria-label="A cream living room and oak table, with an open notebook, a pen, and a laptop showing a Bloom screen titled Your visit with a burgundy flower, beside a lilac flower in a vase" style="background-image:url('library/images/what-to-expect-at-your-first-visit.jpg')"></div><div class="res-top"><span class="pill pill-lilac">Your Visit</span><span class="small">6 min read</span></div><h3><a href="/library/what-to-expect-at-your-first-visit.html">What to expect at your first visit</a></h3><p class="small">How an integrated visit works, from booking to your written plan.</p><a class="link" href="/library/what-to-expect-at-your-first-visit.html">Read</a></article>
+      <article class="neo res reveal" data-category="Lab Results"><div class="res-img" role="img" aria-label="Three collection tubes a little under half full of dark red blood, with emerald, burgundy, and lilac caps, on ivory linen beside a pink flower and an amber bottle" style="background-image:url('library/images/understanding-your-blood-work.jpg')"></div><div class="res-top"><span class="pill pill-lilac">Lab Results</span><span class="small">7 min read</span></div><h3><a href="/library/understanding-your-blood-work.html">Understanding your blood work</a></h3><p class="small">What common lab markers measure, explained in plain language, plus questions to bring to your next visit. Your practitioner will always review your results with you.</p><a class="link" href="/library/understanding-your-blood-work.html">Read</a></article>
+      <article class="neo res reveal" data-category="Wellness"><div class="res-img" role="img" aria-label="A ceramic cup of tea beside a closed book, a white flower and lilac petals on rumpled linen" style="background-image:url('library/images/an-evening-wind-down.jpg')"></div><div class="res-top"><span class="pill pill-lilac">Wellness</span><span class="small">6 min read</span></div><h3><a href="/library/an-evening-wind-down.html">An evening wind-down</a></h3><p class="small">A gentle routine for the hour before bed, from a warm cup of tea to screens off.</p><a class="link" href="/library/an-evening-wind-down.html">Read</a></article>
+      <article class="neo res reveal" data-category="Nutrition"><div class="res-img" role="img" aria-label="A plate of grains, roasted vegetables, leafy greens and orange segments on linen, with a white flower beside it" style="background-image:url('library/images/balanced-eating-made-simple.jpg')"></div><div class="res-top"><span class="pill pill-lilac">Nutrition</span><span class="small">6 min read</span></div><h3><a href="/library/balanced-eating-made-simple.html">Balanced eating, made simple</a></h3><p class="small">Easy ways to build balanced meals around foods you already enjoy.</p><a class="link" href="/library/balanced-eating-made-simple.html">Read</a></article>
+      <article class="neo res reveal" data-category="Recipes"><div class="res-img" role="img" aria-label="A ceramic bowl of vegetable soup with a wooden spoon and a sprig of rosemary" style="background-image:url('library/images/warming-winter-soups.jpg')"></div><div class="res-top"><span class="pill pill-lilac">Recipes</span><span class="small">7 min read</span></div><h3><a href="/library/warming-winter-soups.html">Warming winter soups</a></h3><p class="small">Simple, comforting recipes for the colder months.</p><a class="link" href="/library/warming-winter-soups.html">Read</a></article>
+      <article class="neo res reveal" data-category="Wellness"><div class="res-img" role="img" aria-label="A glass carafe and a glass of water on linen, with white and pink flowers" style="background-image:url('library/images/hydration-made-easy.jpg')"></div><div class="res-top"><span class="pill pill-lilac">Wellness</span><span class="small">6 min read</span></div><h3><a href="/library/hydration-made-easy.html">Hydration, made easy</a></h3><p class="small">Small, everyday habits that make drinking water effortless.</p><a class="link" href="/library/hydration-made-easy.html">Read</a></article>
     </div>
     <p class="lib-credits">Illustrative AI-generated imagery.</p>
     <p class="small-note center">Library articles are general information only and are not medical advice. Please talk with your practitioner before making changes to your diet, supplements or medications.</p>
   </div>
 </main>
+<script>
+(function(){
+  var root=document.getElementById('view-library');
+  if(!root)return;
+  var form=root.querySelector('.lib-tools');
+  var input=root.querySelector('.lib-search-input');
+  var cards=[].slice.call(root.querySelectorAll('.lib-grid article'));
+  var status=document.getElementById('lib-status');
+  var cat=root.querySelector('.lib-cat');
+  var button=root.querySelector('.lib-cat-btn');
+  var panel=document.getElementById('lib-cat-panel');
+  var label=root.querySelector('.lib-cat-label');
+  var allBox=panel.querySelector('[data-all]');
+  var boxes=[].slice.call(panel.querySelectorAll('[data-cat]'));
+  var used=false;
+  function setOpen(open){
+    button.setAttribute('aria-expanded',open?'true':'false');
+    panel.hidden=!open;
+  }
+  function chosen(){return boxes.filter(function(b){return b.checked})}
+  function syncAll(){
+    var n=chosen().length;
+    allBox.checked=n===boxes.length;
+    allBox.indeterminate=n>0&&n<boxes.length;
+    var text=n===boxes.length?'All categories':n===0?'No categories':n===1?chosen()[0].value:n+' categories';
+    label.textContent=text;
+    button.setAttribute('aria-label','Categories, '+text);
+  }
+  function apply(){
+    var q=input.value.trim().toLowerCase();
+    var cats=chosen().map(function(b){return b.value});
+    var shown=0;
+    cards.forEach(function(card){
+      var title=(card.querySelector('h3').textContent||'').toLowerCase();
+      var excerpt=(card.querySelector('h3+p').textContent||'').toLowerCase();
+      var ok=cats.indexOf(card.getAttribute('data-category'))!==-1&&(!q||title.indexOf(q)!==-1||excerpt.indexOf(q)!==-1);
+      card.hidden=!ok;
+      if(ok)shown++;
+    });
+    if(!used)return;
+    var msg;
+    if(shown===0&&cats.length===0)msg='All categories are off. Select one to see articles.';
+    else if(shown===0)msg='No articles match. Try another word, or turn a category back on.';
+    else msg='Showing '+shown+(shown===1?' article.':' articles.');
+    status.textContent=msg;
+    if(shown===0)status.removeAttribute('data-quiet');
+    else status.setAttribute('data-quiet','');
+  }
+  form.addEventListener('submit',function(e){e.preventDefault()});
+  input.addEventListener('input',function(){used=true;apply()});
+  input.addEventListener('search',function(){used=true;apply()});
+  allBox.addEventListener('change',function(){
+    var on=allBox.checked;
+    boxes.forEach(function(b){b.checked=on});
+    used=true;syncAll();apply();
+  });
+  boxes.forEach(function(b){b.addEventListener('change',function(){used=true;syncAll();apply()})});
+  button.addEventListener('click',function(e){
+    var open=button.getAttribute('aria-expanded')!=='true';
+    setOpen(open);
+    if(open&&e.detail===0)allBox.focus();
+  });
+  panel.addEventListener('keydown',function(e){
+    var inputs=[].slice.call(panel.querySelectorAll('input'));
+    var i=inputs.indexOf(document.activeElement);
+    if(e.key==='Escape'){e.preventDefault();setOpen(false);button.focus();return}
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+      e.preventDefault();
+      var next=e.key==='ArrowDown'?Math.min(inputs.length-1,Math.max(0,i)+1):Math.max(0,i-1);
+      inputs[next].focus();
+    }
+  });
+  button.addEventListener('keydown',function(e){
+    if(e.key==='ArrowDown'&&button.getAttribute('aria-expanded')!=='true'){setOpen(true);allBox.focus();e.preventDefault()}
+    if(e.key==='Escape'){setOpen(false)}
+  });
+  cat.addEventListener('focusout',function(){requestAnimationFrame(function(){if(!cat.contains(document.activeElement))setOpen(false)})});
+  document.addEventListener('click',function(e){if(!cat.contains(e.target))setOpen(false)});
+  syncAll();
+})();
+</script>
 
 <!-- ===== BOOKING PAGE ===== -->
 <main id="view-booking" class="view page-view" hidden>
