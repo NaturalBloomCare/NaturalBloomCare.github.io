@@ -286,6 +286,11 @@ footer .fine{font-size:0.66rem;letter-spacing:0.3em;text-transform:uppercase;col
 .auth-art .cap{position:absolute;left:36px;right:36px;bottom:40px;color:#FBF8F2}
 .auth-art .cap .t{font-family:var(--serif);font-size:2.4rem;line-height:1.1}
 .auth-card{margin:48px auto;padding:42px 40px;max-width:460px}
+.portal-home-logo{display:block;width:min(100%,270px);margin:2px 0 2px -8px;line-height:0;text-decoration:none}
+.portal-home-logo svg{width:100%;height:auto;display:block;overflow:visible}
+.portal-home-logo .bloom-logo{--bloom-ink:#2E2B29}
+.portal-home-logo .bloom-logo .ink{transition:fill .5s ease}
+.portal-home-logo:focus-visible{outline:2px solid currentColor;outline-offset:6px;border-radius:4px}
 .field{display:flex;flex-direction:column;gap:8px;margin-top:16px}
 .field label,.lbl{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase}
 .input{height:52px;border:0;border-radius:16px;padding:0 18px;background:var(--bone);box-shadow:inset 4px 4px 10px var(--shadow-dark),inset -4px -4px 10px var(--shadow-light);font:inherit;color:var(--ink);width:100%}
@@ -298,6 +303,8 @@ footer .fine{font-size:0.66rem;letter-spacing:0.3em;text-transform:uppercase;col
 @media(max-width:900px){
   .auth-screen{grid-template-columns:1fr}
   .auth-art{min-height:220px}
+  .auth-card{margin:28px 16px 36px;padding:32px 22px}
+  .portal-home-logo{width:min(100%,240px);margin-left:-6px}
   .banner{padding:0 22px}
   .track-row{grid-template-columns:1fr}
 }
