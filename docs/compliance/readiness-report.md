@@ -61,7 +61,7 @@ These are decisions for the clinic, not things this build silently resolved.
 2. A generated PDF can contain whatever a staff member types into “What you are requesting” and “Note”. That text is not parsed into a diagnosis column, but it is health information inside the file if they paste a history. The guide says history stays in Jane. The field tells them to leave the history in Jane. The clinic should decide whether free text on a requisition is acceptable.
 3. Emailing a link plus a code to the same mailbox does not attach the PDF, and it is not a true second channel. Fax, when Documo is configured, sends the PDF to Documo, which may be outside Canada.
 4. Demographics and the PHN are stored so a requisition can be filled. The guide’s “keep in Jane” list does not name the PHN, but a PHN is still health information. It is in a private table and audited on reveal.
-5. Fictional patients are seeded so the screens can be tried. They are marked testing. GitHub Pages publishes this repository, so the fictional seed and the test passwords are on the public internet. They must be removed or the project locked down before real PHI.
+5. Fictional patients are seeded so the screens can be tried. They are marked testing. Migration 8 replaces the live passwords with random unusable values and replaces the sample health numbers with invalid placeholders such as `00000-0001`. The clinic sets a test password privately through password reset. GitHub Pages still publishes the repository, including the historical seed migration, so the project must stay free of real PHI.
 
 ## Launch blockers that need a person
 

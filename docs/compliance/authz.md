@@ -36,6 +36,8 @@ JWT lifetime is a project setting. This repository cannot set it. It should be s
 
 `authenticated` cannot insert or update `public.wellness_plans` or update `public.patients`. Drafts go through `staff_commit`. A herbalist may only set a plan to Draft or Ready for Review. Approval and publication go through `approve_wellness_plan`. That function requires a signed-in medical user whose credential type is `NP` and whose credential is marked verified, and it sets `approved_by` and, when publishing, `published_by` to `auth.uid()`. The row trigger rejects any other transition into Approved or Published, including one where the approver columns are merely not null.
 
+A published wellness plan’s body and kind cannot be changed. An NP edit in `staff_commit` creates or updates a separate draft and leaves the published row as it was approved. `log_audit` accepts only a fixed list of observational notes, and only for a patient the caller can see. Privileged outcomes, including a health-number reveal, a publication, a deactivation and a document download, are written by the function that performed them.
+
 The trigger also rejects bodies that carry diagnoses, labs, prescriptions or biomarker rows.
 
 Tracking rows are forced to `source = 'patient-entered'`. The client can hide or soft-delete their own rows. A care-team read requires consent, and hidden rows are excluded.

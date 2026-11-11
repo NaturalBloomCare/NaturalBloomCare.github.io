@@ -9,6 +9,13 @@ Apply these files in this order, in the Supabase SQL editor or with `supabase db
 5. `supabase/migrations/20261111180400_seed.sql`
 6. `supabase/migrations/20261111180500_secure_links.sql`
 7. `supabase/migrations/20261111180600_lock_direct_writes.sql`
+8. `supabase/migrations/20261111180700_seed_credentials_and_second_client.sql`
+9. `supabase/migrations/20261111180800_storage_patient_prefix.sql`
+10. `supabase/migrations/20261111180900_audit_integrity.sql`
+11. `supabase/migrations/20261111181000_published_plan_version.sql`
+12. `supabase/migrations/20261111181100_secure_link_throttle.sql`
+
+Migrations 1–7 are already applied on the live project. Apply 8–12 after them, in this order. Do not edit a migration that has already been applied.
 
 Then deploy the Edge Functions:
 
@@ -16,7 +23,9 @@ Then deploy the Edge Functions:
 - `supabase/functions/document-url`
 - `supabase/functions/open-secure-link`
 
-The seed is fictional and marked testing. Staff password on the fictional accounts is `BloomStaff-Test-2026!`. The fictional client `amelia.hart@example.com` uses `BloomClient-Test-2026!`. Disable these accounts before any real information is stored. The passwords are in this public repository.
+After migration 12, redeploy `document-url` and `open-secure-link`. Downloads are recorded by `record_document_download`, and a secure-link code request is throttled by `request_secure_link_code`.
+
+The seed is fictional and marked testing. Migration 8 replaces every `@example.com` password with a random value that cannot be used to sign in, and it replaces stored health numbers with obviously invalid samples such as `00000-0001`. Set a test password privately through the password-reset page. Do not copy a password out of an older migration file. The applied seed file is left as it was applied.
 
 After the SQL is applied, turn on two Authentication hooks or lockout and live role claims will not run:
 

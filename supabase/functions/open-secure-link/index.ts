@@ -34,8 +34,19 @@ Deno.serve(async (req) => {
     }
     const next = randomCode()
     const codeHash = await sha256(next)
-    await admin.from('secure_links').update({ code_hash: codeHash }).eq('id', found.data.id)
-    const sent = await sendCode(provider, apiKey, from, found.data.recipient, next)
+    const gate = await admin.rpc('request_secure_link_code', { p_token_hash: tokenHash, p_code_hash: codeHash })
+    const gateStatus = String(gate.data?.status || '')
+    if (gate.error || !gate.data?.ok) {
+      const status = gateStatus === 'throttled' || gateStatus === 'locked' ? gateStatus : 'invalid'
+      logStatus('secure-link', status, found.data.document_id)
+      const message = status === 'throttled'
+        ? 'A code was just sent. Wait a minute before asking for another.'
+        : status === 'locked'
+          ? 'Too many code requests. This link is locked for 15 minutes.'
+          : 'This link is not valid.'
+      return json({ status, message }, status === 'invalid' ? 404 : 429)
+    }
+    const sent = await sendCode(provider, apiKey, from, String(gate.data.email || ''), next)
     logStatus('secure-link', sent ? 'code_sent' : 'failed', found.data.document_id)
     if (!sent) return json({ status: 'failed', message: 'The confirmation code could not be sent.' }, 502)
     return json({ status: 'code_sent', message: 'A six-digit code was sent to the same address. It is not a second channel, so a person who can read that mailbox can also read the code.' })

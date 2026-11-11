@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://yaehgbbuyzfpkjpdqlzs.supabase.co wss://yaehgbbuyzfpkjpdqlzs.supabase.co; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light only">
 <title>Bloom — Set a new password</title>
@@ -22,28 +24,7 @@
 </main>
 <script src="/assets/bloom-config.js"></script>
 <script src="/assets/vendor/supabase.js"></script>
-<script>
-(function(){
-  var cfg = window.BLOOM_CONFIG;
-  var sb = window.supabase.createClient(cfg.url, cfg.publishableKey, { auth: { detectSessionInUrl: true, persistSession: true } });
-  var form = document.getElementById('form');
-  var err = document.getElementById('err');
-  function show(el){ el.hidden = false; }
-  sb.auth.onAuthStateChange(function(event){
-    if(event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') show(form);
-  });
-  sb.auth.getSession().then(function(r){ if(r.data.session) show(form); });
-  form.addEventListener('submit', function(e){
-    e.preventDefault();
-    err.hidden = true;
-    sb.auth.updateUser({ password: document.getElementById('pw').value }).then(function(r){
-      if(r.error){ err.hidden = false; err.textContent = r.error.message; return; }
-      form.hidden = true;
-      document.getElementById('done').hidden = false;
-      sb.auth.signOut();
-    });
-  });
-})();
-</script>
+<script src="/auth/reset.js"></script>
+
 </body>
 </html>

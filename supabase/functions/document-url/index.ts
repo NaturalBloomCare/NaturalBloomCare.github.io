@@ -24,18 +24,16 @@ Deno.serve(async (req) => {
   }
   const { data: settings } = await admin.from('clinic_settings').select('signed_url_ttl_seconds').eq('id', 1).maybeSingle()
   const ttl = Math.min(300, Math.max(30, Number(settings?.signed_url_ttl_seconds || 120)))
+  const noted = await sb.rpc('record_document_download', { p_id: documentId })
+  if (noted.error) {
+    logStatus('download', 'denied', documentId)
+    return json({ status: 'forbidden' }, 403)
+  }
   const signed = await admin.storage.from('patient-documents').createSignedUrl(doc.storage_path, ttl)
   if (signed.error || !signed.data?.signedUrl) {
     logStatus('download', 'failed', documentId)
     return json({ status: 'error', message: 'A short-lived link could not be created.' }, 500)
   }
-  await sb.rpc('log_audit', {
-    p_action: 'Downloaded document',
-    p_record_id: documentId,
-    p_info_type: 'Requisition PDF',
-    p_ok: true,
-    p_detail: 'Signed URL'
-  })
   logStatus('download', 'signed', documentId)
   return json({ status: 'ok', url: signed.data.signedUrl, expiresIn: ttl })
 })

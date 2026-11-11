@@ -11,6 +11,50 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
+  function sanitizeHtml(html) {
+    var allowed = { P: 1, H2: 1, H3: 1, UL: 1, OL: 1, LI: 1, STRONG: 1, EM: 1, BR: 1, A: 1 };
+    var drop = { SCRIPT: 1, STYLE: 1, IFRAME: 1, OBJECT: 1, EMBED: 1, LINK: 1, META: 1 };
+    var doc = new DOMParser().parseFromString(String(html || ''), 'text/html');
+    function scrub(node) {
+      var kids = Array.prototype.slice.call(node.childNodes);
+      for (var i = 0; i < kids.length; i++) {
+        var child = kids[i];
+        if (child.nodeType === 3) continue;
+        if (child.nodeType !== 1) {
+          node.removeChild(child);
+          continue;
+        }
+        if (drop[child.tagName]) {
+          node.removeChild(child);
+          continue;
+        }
+        if (!allowed[child.tagName]) {
+          while (child.firstChild) node.insertBefore(child.firstChild, child);
+          node.removeChild(child);
+          scrub(node);
+          return;
+        }
+        var attrs = Array.prototype.slice.call(child.attributes);
+        for (var a = 0; a < attrs.length; a++) {
+          var name = attrs[a].name.toLowerCase();
+          if (child.tagName === 'A' && name === 'href' && /^https?:\/\//i.test(attrs[a].value)) {
+            child.setAttribute('rel', 'noopener noreferrer');
+          } else {
+            child.removeAttribute(attrs[a].name);
+          }
+        }
+        scrub(child);
+      }
+    }
+    scrub(doc.body);
+    return doc.body.innerHTML;
+  }
+  function safeImage(url) {
+    var value = String(url || '');
+    if (/^\/[A-Za-z0-9._~/-]+$/.test(value)) return value;
+    if (/^https:\/\/[A-Za-z0-9.-]+\/[A-Za-z0-9._~/-]*$/.test(value)) return value;
+    return '';
+  }
   function $(html) { document.getElementById('app').innerHTML = html; }
   function initials(p) { return ((p.first || ' ')[0] + (p.last || ' ')[0]).toUpperCase(); }
 
@@ -253,9 +297,10 @@
       reader.querySelector('[data-r-title]').textContent = post.title;
       reader.querySelector('[data-r-topic]').textContent = post.topic;
       reader.querySelector('[data-r-desc]').textContent = post.desc;
-      reader.querySelector('[data-r-body]').innerHTML = post.body;
+      reader.querySelector('[data-r-body]').innerHTML = sanitizeHtml(post.body);
       var hero = reader.querySelector('[data-r-img]');
-      hero.style.backgroundImage = post.img ? "url('" + post.img + "')" : '';
+      var img = safeImage(post.img);
+      hero.style.backgroundImage = img ? "url('" + img + "')" : '';
       reader.hidden = false;
     }
     if (e.target.closest('[data-close]')) {

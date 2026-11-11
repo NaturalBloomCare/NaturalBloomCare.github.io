@@ -14,7 +14,9 @@ Each row has:
 - `detail` (a short label, capped)
 - `ok`
 
-Writes of patient tables also fire `audit.row_change`. Reads of the workspace and the client home are logged inside `staff_bootstrap` and `client_home`, because Postgres cannot attach a trigger to `SELECT`. Downloads call `log_audit` from `document-url`. Sends insert `public.disclosures`, which is also append-only, and the document row change is audited.
+Writes of patient tables also fire `audit.row_change`. Reads of the workspace and the client home are logged inside `staff_bootstrap` and `client_home`, because Postgres cannot attach a trigger to `SELECT`. Downloads call `record_document_download`, which checks that the caller can see the document and then writes the audit row. `log_audit` is limited to observational notes. Sends insert `public.disclosures`, which is also append-only, and the document row change is audited.
+
+Each audit row stores the previous row’s hash. The head of that chain lives on one `audit.chain` row, which `audit.stamp` locks until the writing transaction commits. Two concurrent writes therefore continue from the same head, including when a row id was allocated before the writer obtained the lock. The hash covers the actor, action, record, information type, detail and time.
 
 Failed passwords are written by the password hook: failed sign-in, lock, deactivated, invited. The password itself is not stored.
 
