@@ -15,8 +15,13 @@
 <main class="wrap" style="padding-top:72px;max-width:560px">
   <a class="brand logo-link" href="/"><img src="/assets/logo/bloom-logo-animated-hover-dark.svg" alt="Bloom Integrative Health"></a>
   <h1 style="margin-top:28px">Set a new <em>password.</em></h1>
-  <p class="lede" id="lead">Open the link in your reset email on this page. Then choose a new password.</p>
+  <p class="lede" id="lead">Enter your email and we will send a reset link to this page. If you already opened that link, choose a new password below.</p>
   <p class="err" id="err" hidden></p>
+  <form id="ask">
+    <div class="field"><label for="email">Email</label><input class="input" id="email" type="email" autocomplete="email" required></div>
+    <button class="cta cta-solid tap-target" type="submit" style="margin-top:18px">Send reset link</button>
+  </form>
+  <p class="small" id="asked" hidden style="margin-top:18px">If an account exists for that email, a reset link is on its way. It opens on this page.</p>
   <form id="form" hidden>
     <div class="field"><label for="pw">New password</label><input class="input" id="pw" type="password" autocomplete="new-password" minlength="12" required></div>
     <button class="cta cta-solid" type="submit" style="margin-top:18px">Save password</button>

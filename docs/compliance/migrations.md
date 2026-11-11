@@ -16,8 +16,12 @@ Apply these files in this order, in the Supabase SQL editor or with `supabase db
 12. `supabase/migrations/20261111181100_secure_link_throttle.sql`
 13. `supabase/migrations/20261111181200_audit_chain_rls_and_code_release.sql`
 14. `supabase/migrations/20261111181300_portal_access_list.sql`
+15. `supabase/migrations/20261111181400_requisition_email_links.sql`
+16. `supabase/migrations/20261111181500_role_matrix_and_read_audit.sql`
 
-Migrations 1–13 are already applied on the live project. Migration 14 is not applied yet. Review it before applying. It does not create users. After it is applied, turn the custom access token hook on and set a short JWT expiry. Clover then syncs the sheet with `private.apply_access_list` using the service role. The seed file no longer contains a sign-in secret. Migration 8 is what replaced the live passwords.
+Migrations 1–14 are the files through the access list. Migrations 15 and 16 are not applied to the live project yet. Review them before applying. They do not create users. After the access-list migration is applied, turn the custom access token hook on and set a short JWT expiry. Clover then syncs the sheet with `private.apply_access_list` using the service role. The seed file no longer contains a sign-in secret. Migration 8 is what replaced the live passwords.
+
+`supabase/scripts/go_live_cleanup.sql` is not a migration. It refuses to run unless `bloom.confirm_go_live` is `yes`, and the copy in the repository ends in `rollback`. Use it only before any real record exists, to delete `@example.com` accounts and rows marked testing.
 
 Then deploy the Edge Functions:
 

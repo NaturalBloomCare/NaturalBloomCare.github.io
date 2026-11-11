@@ -356,7 +356,8 @@ function audit(u, action, target, ok, meta){
   liveAudit(S.audit[S.audit.length-1]);
   if(S.audit.length>600) S.audit = S.audit.slice(-600);
   save();
-  if(window.sb && u) window.sb.rpc('log_audit', { p_action:action, p_record_id:(meta&&meta.pid)||'', p_info_type:(meta&&meta.info)||'', p_ok:ok!==false, p_detail:String(target).slice(0,180) });
+  if(window.sb && u && meta.pid && /^(Opened|Viewed) /.test(action)) window.sb.rpc('note_staff_view', { p_legacy_id: meta.pid, p_kind: /requisition/i.test(action + ' ' + (meta.info||'')) ? 'Requisition' : (/document/i.test(action + ' ' + (meta.info||'')) ? 'Document' : 'Client record') });
+  else if(window.sb && u) window.sb.rpc('log_audit', { p_action:action, p_record_id:(meta&&meta.pid)||'', p_info_type:(meta&&meta.info)||'', p_ok:ok!==false, p_detail:String(target).slice(0,180) });
 }
 
 /* ---------- 7. session ---------- */
@@ -780,7 +781,7 @@ function auditPage(u){
   audit(u,'Viewed audit history','Audit history',true);
   let h = pageHead('Owner portal', 'Audit <em>history</em>', 'Every sign-in, record view, change and denied request. Entries cannot be edited or deleted.');
   h += '<div class="neo panel"><div class="filters"><label class="sr" for="au-u">Staff member</label><select class="select" id="au-u" data-filter="audit"><option value="">All staff</option>'+S.staff.map(s => '<option value="'+s.id+'"'+(auditPreset===s.id?' selected':'')+'>'+esc(fullName(s))+'</option>').join('')+'</select><label class="sr" for="au-o">Outcome</label><select class="select" id="au-o" data-filter="audit"><option value="">All outcomes</option><option value="ok">Allowed</option><option value="no">Denied or blocked</option></select><label class="sr" for="au-p">Patient</label><select class="select" id="au-p" data-filter="audit"><option value="">All patients</option>'+PATIENTS.map(p => '<option value="'+p.id+'">'+p.id+'</option>').join('')+'</select></div><p class="tiny" style="margin:-8px 0 18px">Choose a patient ID for a patient activity report: everyone who opened or changed that record. Patients can ask for this.</p><div id="au-table">'+auditTable()+'</div></div>';
-  h += '<div class="notice sec">'+icon('audit')+'<div>Each entry records who, their role, when, what they did, the patient ID and the type of information, never the clinical details. In production the server writes entries to append-only storage and keeps them for 10 years from the date of use, as Alberta’s provincial logging standard requires. This prototype keeps the last 400 entries in your browser.</div></div>';
+  h += '<div class="notice sec">'+icon('audit')+'<div>These rows are written by the server. Staff cannot edit or delete them. Each entry records who, their role, when, what they did, the record id and the type of information. The health number and the PDF are not copied into the log. The owner sees the latest 400 server entries.</div></div>';
   h += '<div class="neo panel sec"><div class="panel-head"><div><span class="num">HIA s. 41</span><h2>Disclosure log</h2></div><span class="small">Kept 10 years from each disclosure</span></div>'+disclosureTable()+'</div>';
   setTimeout(() => { auditPreset = ''; }, 0);
   return h;
@@ -1927,7 +1928,7 @@ function enrollScreen(){
 function loginScreen(){
     return '<div class="auth"><div class="auth-art" role="img" aria-label="Lilac petals"><div class="cap"><div class="t">Where health takes root</div><div class="s">Bloom · Staff portal</div></div></div><div class="neo auth-card"><a class="brand logo-link" href="#/signin"><img class="bloom-mark" src="/assets/logo/bloom-logo-animated-hover-dark.svg" alt="Bloom Integrative Health"></a><div class="eyebrow" style="margin-top:26px">Staff portal</div><h1>Welcome <em>back.</em></h1><p class="small" style="margin-top:10px">One sign-in for owners, admins and practitioners. You will be taken to the portal your role allows.</p>'+
     '<form class="form" data-form="login">'+(auth.err?'<div class="err" role="alert">'+esc(auth.err)+'</div>':'')+'<div class="field"><label for="li-email">Work email</label><input class="input" id="li-email" type="email" autocomplete="username" value="'+esc(auth.email)+'" placeholder="name@bloom.example" required></div><div class="field"><label for="li-pass">Password</label><input class="input" id="li-pass" type="password" autocomplete="current-password" placeholder="Your password" required></div><button class="cta cta-solid" type="submit" style="margin-top:6px">Continue '+icon('arrow',14)+'</button><p class="tiny">For authorized Bloom staff only. Every sign-in and record you open is recorded and audited under Alberta’s Health Information Act.</p></form>'+
-    '<p class="tiny" style="margin-top:14px"><a class="link" href="/auth/reset.html">Forgot password?</a></p><div class="auth-foot"><a class="link" href="#/blueprint">Phase 1 blueprint</a><span class="tiny" style="align-self:center">Secure session · signs out after '+S.timeout+' minutes idle</span></div></div></div>';
+    '<p class="tiny" style="margin-top:14px"><a class="link tap-target" href="/auth/reset.html">Forgot password?</a></p><div class="auth-foot"><a class="link" href="#/blueprint">Phase 1 blueprint</a><span class="tiny" style="align-self:center">Secure session · signs out after '+S.timeout+' minutes idle</span></div></div></div>';
 }
 function startSession(u){
     tasksUI = { view:'me', urg:'all', q:'', scope:'mine' }; taskBack = '';

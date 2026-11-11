@@ -11,8 +11,8 @@ This is an inventory for the Nurse Practitioner’s PIA and for contract review.
 | GitHub Pages | Serves the static site, including this repository. | GitHub’s hosting. Not a Canadian health region. | Needs human review. Migration files with fictional records are downloadable because Pages serves the repo root. |
 | Jane | Clinical system of record. Not integrated by API. | Jane’s region, to be confirmed in Jane’s agreement. | Needs human review. The portal URL is a blank placeholder. |
 | Google Apps Script | Existing waitlist. Left unchanged. | Google. | Already in production on the site. Cross-border. Needs human review. |
-| Email provider | Not selected. The function reads `EMAIL_PROVIDER`, `EMAIL_API_KEY`, `EMAIL_FROM`. | Unknown until chosen. | Not configured. Nothing is sent. |
-| Documo | Intended fax provider. Used only when `FAX_PROVIDER=documo` and `FAX_API_KEY` are set. | Documo’s region, commonly outside Canada. | Not configured. Needs human review before a fax of a requisition is turned on. |
+| Email provider | Not selected. `send-document` and `open-secure-link` read `EMAIL_PROVIDER` (`resend`, `postmark`, or a custom `EMAIL_API_URL`), `EMAIL_API_KEY`, and `EMAIL_FROM`. No key is in the repository. A requisition email contains a Bloom link and a neutral notice. It does not attach the PDF and it does not name the patient or a health number. | Unknown until chosen. The clinic has to pick a provider and decide where that vendor stores the message. | Not configured. Nothing is sent. |
+| Documo | Fax code remains. It runs only when `FAX_ENABLED=true`, `clinic_settings.fax_enabled` is true, `FAX_PROVIDER=documo`, and `FAX_API_KEY` is set. The defaults are off. | Documo’s region, commonly outside Canada. | Off. Needs human review before a fax of a requisition is turned on. |
 | Open-Meteo | Removed. The staff clock no longer calls it. | — | Not used. |
 
 Fonts and the Supabase, pdf.js, jsPDF and html2canvas libraries are files in this repository. The browser does not call Google Fonts or a JavaScript CDN for them.
