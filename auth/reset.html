@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<title>Bloom — Set a new password</title>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/portal/portal.css">
+</head>
+<body>
+<main class="wrap" style="padding-top:72px;max-width:560px">
+  <a class="brand" href="/">BLOOM</a>
+  <h1 style="margin-top:28px">Set a new <em>password.</em></h1>
+  <p class="lede" id="lead">Open the link in your reset email on this page. Then choose a new password.</p>
+  <p class="err" id="err" hidden></p>
+  <form id="form" hidden>
+    <div class="field"><label for="pw">New password</label><input class="input" id="pw" type="password" autocomplete="new-password" minlength="12" required></div>
+    <button class="cta cta-solid" type="submit" style="margin-top:18px">Save password</button>
+  </form>
+  <p class="small" id="done" hidden style="margin-top:18px">Password saved. You can close this page and sign in.</p>
+</main>
+<script src="/assets/bloom-config.js"></script>
+<script src="/assets/vendor/supabase.js"></script>
+<script>
+(function(){
+  var cfg = window.BLOOM_CONFIG;
+  var sb = window.supabase.createClient(cfg.url, cfg.publishableKey, { auth: { detectSessionInUrl: true, persistSession: true } });
+  var form = document.getElementById('form');
+  var err = document.getElementById('err');
+  function show(el){ el.hidden = false; }
+  sb.auth.onAuthStateChange(function(event){
+    if(event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') show(form);
+  });
+  sb.auth.getSession().then(function(r){ if(r.data.session) show(form); });
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    err.hidden = true;
+    sb.auth.updateUser({ password: document.getElementById('pw').value }).then(function(r){
+      if(r.error){ err.hidden = false; err.textContent = r.error.message; return; }
+      form.hidden = true;
+      document.getElementById('done').hidden = false;
+      sb.auth.signOut();
+    });
+  });
+})();
+</script>
+</body>
+</html>

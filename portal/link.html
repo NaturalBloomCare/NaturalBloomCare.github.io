@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<title>Bloom — Secure document</title>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/portal/portal.css">
+</head>
+<body>
+<main class="wrap" style="padding-top:72px;max-width:640px">
+  <a class="brand" href="/">BLOOM</a>
+  <h1 style="margin-top:28px">A secure <em>document.</em></h1>
+  <p class="lede">Natural Bloom Care Inc. did not attach the file to an email. Request a confirmation code, then enter it. The document opens for two minutes.</p>
+  <p class="small" id="msg" style="margin-top:18px"></p>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:22px">
+    <button class="cta cta-ghost" id="ask" type="button">Email me a code</button>
+  </div>
+  <form id="form" class="field" style="margin-top:18px">
+    <label for="code">Six-digit code</label>
+    <input class="input" id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+    <button class="cta cta-solid" type="submit" style="margin-top:16px">Open the document</button>
+  </form>
+  <p class="small" style="margin-top:22px">The code goes to the same mailbox as the link. That is not a separate channel. If you were not expecting this, close the page.</p>
+</main>
+<script src="/assets/bloom-config.js"></script>
+<script>
+(function(){
+  var cfg = window.BLOOM_CONFIG;
+  var token = new URLSearchParams(location.search).get('t') || '';
+  var msg = document.getElementById('msg');
+  function say(t){ msg.textContent = t; }
+  if(!token){ say('This link is missing its token.'); return; }
+  function call(body){
+    return fetch(cfg.url + '/functions/v1/open-secure-link', {
+      method:'POST',
+      headers:{ 'content-type':'application/json', apikey: cfg.publishableKey },
+      body: JSON.stringify(body)
+    }).then(function(r){ return r.json(); });
+  }
+  document.getElementById('ask').addEventListener('click', function(){
+    say('Sending a code…');
+    call({ token: token, action: 'request-code' }).then(function(j){
+      say(j.message || j.status || 'Done.');
+    }).catch(function(){ say('The code could not be requested.'); });
+  });
+  document.getElementById('form').addEventListener('submit', function(e){
+    e.preventDefault();
+    say('Checking the code…');
+    call({ token: token, action: 'confirm', code: document.getElementById('code').value }).then(function(j){
+      if(j.url){ say('Opening the document. This link expires in about two minutes.'); location.href = j.url; }
+      else say(j.message || 'The code was not accepted.');
+    }).catch(function(){ say('The document could not be opened.'); });
+  });
+})();
+</script>
+</body>
+</html>

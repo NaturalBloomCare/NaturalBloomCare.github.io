@@ -1,0 +1,13 @@
+# Bloom Portals — Edge Function settings for the hosted project yaehgbbuyzfpkjpdqlzs.
+# Apply with the Supabase CLI from this directory after `supabase link`.
+project_id = "yaehgbbuyzfpkjpdqlzs"
+
+[functions.send-document]
+verify_jwt = true
+
+[functions.document-url]
+verify_jwt = true
+
+[functions.open-secure-link]
+# The recipient is not signed in. The function checks a stored token itself.
+verify_jwt = false
