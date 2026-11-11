@@ -1103,7 +1103,7 @@ footer a:hover{color:var(--bone)}
           <p class="bio">[Short personal bio: background, approach, what they love about this work.]</p>
           <div class="pp-price">
             <div><span class="kind">Medical visit</span><div class="price">$195<small>/ 30 min</small></div></div>
-            <a href="#waitlist" class="btn btn-soft" data-modal="waitlist">Book medical</a>
+            <a href="#waitlist?visit=medical" class="btn btn-soft" data-modal="waitlist" data-visit="medical">Book medical</a>
           </div>
         </div>
       </article>
@@ -1120,7 +1120,7 @@ footer a:hover{color:var(--bone)}
           <p class="bio">[Short personal bio: training, approach, favourite everyday ritual.]</p>
           <div class="pp-price">
             <div><span class="kind">Wellness visit</span><div class="price">$135<small>/ 30 min</small></div></div>
-            <a href="#waitlist" class="btn btn-soft" data-modal="waitlist">Book wellness</a>
+            <a href="#waitlist?visit=wellness" class="btn btn-soft" data-modal="waitlist" data-visit="wellness">Book wellness</a>
           </div>
         </div>
       </article>
@@ -1138,7 +1138,7 @@ footer a:hover{color:var(--bone)}
       </div>
       <div class="pp-int-price">
         <div class="price">$330<small>/ 60 min</small></div>
-        <a href="#waitlist" class="btn btn-solid" data-modal="waitlist">Book integrated</a>
+        <a href="#waitlist?visit=integrated" class="btn btn-solid" data-modal="waitlist" data-visit="integrated">Book integrated</a>
       </div>
     </div>
 
@@ -1345,14 +1345,13 @@ footer a:hover{color:var(--bone)}
 </main>
 
 <!-- ===== PRIVACY PAGE ===== -->
-<!-- DRAFT privacy policy: have your lawyer and privacy officer review and complete all [bracketed] items before launch. -->
 <main id="view-privacy" class="view page-view" hidden>
   <div class="wrap">
     <div class="page-head reveal">
       <div class="eyebrow">Privacy</div>
       <h1>Your privacy, <em>protected.</em></h1>
       <p class="lede">How Bloom collects, uses, shares and protects your personal and health information, and the choices you have.</p>
-      <p class="small-note">Last updated: [Date]</p>
+      <p class="small-note">Last updated: November 11, 2026</p>
     </div>
     <div class="legal-grid">
       <nav class="legal-toc neo reveal" aria-label="On this page">
@@ -1361,6 +1360,8 @@ footer a:hover{color:var(--bone)}
         <a href="#pv-why" data-scroll>Why we collect it</a>
         <a href="#pv-authority" data-scroll>Legal authority &amp; consent</a>
         <a href="#pv-share" data-scroll>How we use &amp; share it</a>
+        <a href="#pv-virtual" data-scroll>Virtual care</a>
+        <a href="#pv-waitlist" data-scroll>Waitlist form</a>
         <a href="#pv-systems" data-scroll>Technology, AI &amp; automated systems</a>
         <a href="#pv-security" data-scroll>Storage &amp; security</a>
         <a href="#pv-retention" data-scroll>Retention</a>
@@ -1373,8 +1374,8 @@ footer a:hover{color:var(--bone)}
       </nav>
       <div class="legal-body reveal">
         <section id="pv-who"><h3>Who we are</h3>
-          <p>Bloom is a virtual integrative care clinic operated by Natural Bloom Care Inc., based in Calgary, Alberta. We provide care to patients who are physically located in Alberta at the time of their visit.</p>
-          <p>Our Nurse Practitioners are custodians of health information under Alberta's <i>Health Information Act</i> (HIA). Personal information that is not health information, and information handled in connection with non-medical wellness services, is protected under Alberta's <i>Personal Information Protection Act</i> (PIPA). We follow whichever law applies.</p></section>
+          <p>Natural Bloom Care Inc. (Bloom) is a virtual clinic in Calgary, Alberta. Care is for people who are in Alberta during the visit.</p>
+          <p>Nurse Practitioners who provide medical care at Bloom are custodians of health information under Alberta's <i>Health Information Act</i> (HIA). Natural Bloom Care Inc. handles that information for the clinic. Personal information that is not health information is protected under Alberta's <i>Personal Information Protection Act</i> (PIPA). The federal <i>Personal Information Protection and Electronic Documents Act</i> (PIPEDA) can also apply to personal information in commercial activity that PIPA does not cover, including some information that crosses a provincial or national border.</p></section>
         <section id="pv-collect"><h3>Information we collect</h3>
           <p>We only collect what we need to provide and manage your care:</p>
           <ul class="pv-list">
@@ -1393,7 +1394,7 @@ footer a:hover{color:var(--bone)}
             <li>To maintain and improve the quality and safety of our services.</li>
           </ul></section>
         <section id="pv-authority"><h3>Legal authority &amp; consent</h3>
-          <p>We collect, use and disclose health information as permitted by the <i>Health Information Act</i> [specific section(s) to be confirmed by legal counsel], and personal information as permitted by the <i>Personal Information Protection Act</i>. Where consent is required, we will ask for it, and you may withdraw your consent at any time, subject to legal or contractual limits. Withdrawing consent may affect our ability to provide some services.</p></section>
+          <p>We collect, use, and disclose health information as the <i>Health Information Act</i> allows, including to provide care and to meet legal duties. We handle other personal information as the <i>Personal Information Protection Act</i> allows, and under PIPEDA where that Act applies. Where consent is required, we will ask for it. You may withdraw consent, subject to legal limits. Withdrawing consent may mean we cannot provide some services.</p></section>
         <section id="pv-share"><h3>How we use &amp; share it</h3>
           <p>Your information is accessed only by those who need it to care for you or run the clinic. We may share it:</p>
           <ul class="pv-list">
@@ -1402,21 +1403,29 @@ footer a:hover{color:var(--bone)}
             <li>With service providers that help us operate, such as our booking and records platform, video visit, email and payment providers, under agreements that require them to protect it.</li>
             <li>When required or permitted by law, such as to a regulatory college or court order.</li>
           </ul>
-          <p><b>We never sell your information.</b></p></section>
+          <p><b>We do not sell your information.</b></p></section>
+        <section id="pv-virtual"><h3>Virtual care</h3>
+          <p>Medical visits are virtual. Because our Nurse Practitioners are licensed in Alberta, you need to be in Alberta during each appointment. A prescription or other medical decision is made only after an assessment by the Nurse Practitioner. A video visit cannot cover every concern. If you need an in-person exam, urgent care, or another service, we will say so.</p>
+          <p>Bloom does not provide urgent or emergency care. In an emergency, call 911. For non-urgent advice in Alberta, call Health Link at 811.</p></section>
+        <section id="pv-waitlist"><h3>Waitlist form</h3>
+          <p>The website waitlist form asks for your name, email, phone if you choose to give it, the type of visit you are interested in, and an optional note. Please do not put health details in that note. Joining the waitlist does not create a practitioner–client relationship and does not book an appointment.</p>
+          <p>The form is sent over an encrypted connection (HTTPS) to a Google Apps Script that Bloom uses to add the request to its waitlist spreadsheet. That spreadsheet is an administrative list. It is not your health record.</p></section>
         <section id="pv-systems"><h3>Technology, AI &amp; automated systems</h3>
-          <p>Your information is entered into secure electronic systems, including our practice management platform [Jane] and our client portal. Daisy, our automated AI assistant in the portal, shares general, non-medical wellness information and portal support. Daisy does not give medical advice or interpret your results.</p>
-          <p>[Confirm: privacy impact assessment(s) submitted to the Office of the Information and Privacy Commissioner of Alberta for these systems.]</p></section>
+          <p>Health records are kept in Jane (Jane App). Jane's public documentation says that clinic data for an account set to Canada is stored in Montreal, Quebec, and Calgary, Alberta. Some Jane features, including text reminders, video visits, and AI note tools, may process limited information temporarily outside Canada. Jane says the information it stores remains in the region chosen for the clinic's account.</p>
+          <p>If you use Bloom's client portal, an automated assistant called Daisy can share general, non-medical information and help you move around the portal. Daisy does not give medical advice and does not interpret results.</p>
+          <p>Bloom completes and maintains a privacy impact assessment as required under section 64 of the <i>Health Information Act</i>, and submits it to the Office of the Information and Privacy Commissioner of Alberta for review and comment before using a new or changed system that collects, uses, or discloses identifying health information. This notice does not mean the Commissioner has accepted an assessment.</p></section>
         <section id="pv-security"><h3>Storage &amp; security</h3>
-          <p>We protect your information with administrative, technical and physical safeguards, including encrypted connections (SSL), role-based access, secure passwords and staff confidentiality agreements. [Confirm where records are stored, e.g. on servers located in Canada.]</p></section>
+          <p>We use administrative, technical, and physical safeguards that are reasonable for a small clinic. These include limiting access to people who need it for their role, using passwords, and training staff to keep information confidential. This website is served over HTTPS. Jane states that data sent to Jane and data stored in Jane are encrypted. No system can promise that information will never be lost or disclosed.</p></section>
         <section id="pv-retention"><h3>Retention</h3>
-          <p>We keep health records for the period required by law and professional standards [retention period to be confirmed], and then securely destroy them.</p></section>
+          <p>The <i>Health Information Act</i> requires custodians to protect health information for its whole life, but it does not set the number of years a record must be kept. That period comes from professional standards. The College of Registered Nurses of Alberta's <i>Privacy and Management of Health Information Standards</i> (2022) require client records to stay accessible for 10 years after the last service. For a minor, the record must stay accessible for 10 years after the last service, or for 2 years after the client reaches the age of majority, whichever is longer. In Alberta the age of majority is 18. When a record is no longer required, we destroy it in a secure way or have our service provider do so.</p></section>
         <section id="pv-rights"><h3>Your rights</h3>
           <ul class="pv-list">
             <li><b>Access</b>: you may request a copy of your health and personal information.</li>
             <li><b>Correction</b>: you may ask us to correct information you believe is inaccurate or incomplete.</li>
             <li><b>Consent</b>: you may withdraw consent where consent is the basis for collection.</li>
           </ul>
-          <p>To make a request, contact our Privacy Officer. We will respond within the time required by law.</p></section>
+          <p>To make a request, contact the Privacy Officer. We will respond within the time required by the <i>Health Information Act</i> or the <i>Personal Information Protection Act</i>, as applicable.</p>
+          <p>You may also complain to the Office of the Information and Privacy Commissioner of Alberta. See “Questions &amp; complaints” below.</p></section>
         <section id="pv-family"><h3>Children &amp; families</h3>
           <p>Children and teens under 18 can be registered by a parent or legal guardian who is an active Bloom client. A parent or guardian provides information and consent on the child's behalf, as permitted by law.</p></section>
         <section id="pv-comms"><h3>Communications</h3>
@@ -1426,7 +1435,7 @@ footer a:hover{color:var(--bone)}
         <section id="pv-breach"><h3>If something goes wrong</h3>
           <p>If a privacy breach occurs that creates a risk of harm, we will notify affected individuals and the appropriate authorities as required by law.</p></section>
         <section id="pv-contact"><h3>Questions &amp; complaints</h3>
-          <p><b>Privacy Officer:</b> [Name] · [privacy email] · [phone]<br>General enquiries: <a href="mailto:hello@naturalbloom.ca">hello@naturalbloom.ca</a></p>
+          <p><b>Privacy Officer, Natural Bloom Care Inc.</b><br>Email: <a href="mailto:hello@naturalbloom.ca">hello@naturalbloom.ca</a></p>
           <p>If you are not satisfied with our response, you may contact the Office of the Information and Privacy Commissioner of Alberta at <a href="https://oipc.ab.ca" target="_blank" rel="noopener">oipc.ab.ca</a>.</p></section>
       </div>
     </div>
@@ -1668,7 +1677,7 @@ footer a:hover{color:var(--bone)}
     <div class="page-head reveal">
       <div class="eyebrow">Book an appointment</div>
       <h1>Choose your <em>visit.</em></h1>
-      <p class="lede">Select the visit that suits you. You'll continue to our secure booking platform to choose a time.</p>
+      <p class="lede">Choose the visit you are interested in. This joins the waitlist. It does not confirm an appointment.</p>
     </div>
     <div class="bk-grid">
       <article class="bk-card neo reveal feature">
@@ -1676,28 +1685,25 @@ footer a:hover{color:var(--bone)}
         <h3>Both practitioners, together</h3>
         <div class="price">$330<small>/ 60 min</small></div>
         <p>Your Nurse Practitioner and Herbalist &amp; Nutrition Specialist in one 60-minute integrated visit, bringing medical and holistic care together in a single appointment.</p>
-        <!-- Replace href with your Jane booking link for this visit type -->
-        <a href="#booking" class="btn btn-solid">Continue to booking</a>
+        <a href="#waitlist?visit=integrated" class="btn btn-solid" data-modal="waitlist" data-visit="integrated">Join the waitlist</a>
       </article>
       <article class="bk-card neo reveal">
         <span class="kind">Medical visit</span>
         <h3>Nurse Practitioner</h3>
         <div class="price">$195<small>/ 30 min</small></div>
         <p>Medical assessment, lab work and care, with a focus on functional medicine.</p>
-        <!-- Replace href with your Jane booking link for this visit type -->
-        <a href="#booking" class="btn btn-soft">Continue to booking</a>
+        <a href="#waitlist?visit=medical" class="btn btn-soft" data-modal="waitlist" data-visit="medical">Join the waitlist</a>
       </article>
       <article class="bk-card neo reveal">
         <span class="kind">Wellness visit</span>
         <h3>Herbalist &amp; Nutrition</h3>
         <div class="price">$135<small>/ 30 min</small></div>
         <p>Herbal and nutrition education and coaching to build sustainable, everyday habits.</p>
-        <!-- Replace href with your Jane booking link for this visit type -->
-        <a href="#booking" class="btn btn-soft">Continue to booking</a>
+        <a href="#waitlist?visit=wellness" class="btn btn-soft" data-modal="waitlist" data-visit="wellness">Join the waitlist</a>
       </article>
     </div>
     <div class="bk-info reveal">
-      <h4>Before you book</h4>
+      <h4>Before you join</h4>
       <ul>
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Visits are for patients physically located in Alberta at the time of their visit.</span></li>
         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Bloom is a private clinic. Visits are not billed to Alberta Health Care, and you'll receive a receipt for every visit.</span></li>
@@ -1759,7 +1765,7 @@ footer a:hover{color:var(--bone)}
       <label>Password<input type="password" autocomplete="current-password" placeholder="••••••••"></label>
       <button class="btn btn-solid" type="submit">Sign in</button>
     </form>
-    <div class="m-links"><a href="#login">Forgot password?</a><a href="#booking" data-close>New to Bloom? Book a visit</a></div>
+    <div class="m-links"><a href="#login">Forgot password?</a><a href="#waitlist" data-modal="waitlist" data-close>New to Bloom? Join the waitlist</a></div>
   </div>
 </div>
 <div class="modal-ov" id="modal-waitlist" hidden>
@@ -1773,7 +1779,7 @@ footer a:hover{color:var(--bone)}
       <div class="wl-row"><label>First name<input name="first" required autocomplete="given-name"></label><label>Last name<input name="last" required autocomplete="family-name"></label></div>
       <label>Email<input type="email" name="email" required autocomplete="email" placeholder="you@example.com"></label>
       <label>Phone (optional)<input type="tel" name="phone" autocomplete="tel"></label>
-      <label>I'm interested in<select name="interest" required><option value="" disabled selected>Choose one</option><option>Nurse Practitioner visit</option><option>Herbalist &amp; Nutrition visit</option><option>Integrated visit</option><option>Not sure</option></select></label>
+      <label>I'm interested in<select name="interest" required><option value="" disabled selected>Choose one</option><option value="Nurse Practitioner visit">Nurse Practitioner visit</option><option value="Herbalist &amp; Nutrition visit">Herbalist &amp; Nutrition visit</option><option value="Integrated visit">Integrated visit</option><option value="Not sure">Not sure</option></select></label>
       <label>Note (optional)<textarea name="note" rows="2" maxlength="500" placeholder="Timing or how to reach you. Please leave out health details."></textarea></label>
       <p class="wl-status" id="wl-status" role="status" aria-live="polite" hidden></p>
       <button class="btn btn-solid" type="submit">Join waitlist</button>
@@ -1832,10 +1838,10 @@ addEventListener('scroll',()=>{if(!ticking){ticking=true;requestAnimationFrame(p
 addEventListener('resize',para);reduceMotion.addEventListener('change',para);para();
 /* simple page views */
 const VIEWS={'#legal':'view-legal','#privacy':'view-privacy','#library':'view-library','#booking':'view-booking'};
-function route(){const h=location.hash;const v=VIEWS[h]||'view-home';
+function route(){const h=(location.hash||'').split('?')[0];const v=VIEWS[h]||'view-home';
  document.querySelectorAll('.view').forEach(el=>{el.hidden=(el.id!==v)});
  if(VIEWS[h]){window.scrollTo({top:0,behavior:'instant'});}
- else if(h&&h.length>1&&!document.getElementById('modal-'+h.slice(1))){const t=document.querySelector(h);if(t)requestAnimationFrame(()=>t.scrollIntoView());}
+ else if(h&&h.length>1&&!document.getElementById('modal-'+h.slice(1))){try{const t=document.querySelector(h);if(t)requestAnimationFrame(()=>t.scrollIntoView());}catch(e){}}
  document.querySelectorAll('.view:not([hidden]) .reveal').forEach(el=>el.classList.add('in'));
  navState();para();}
 addEventListener('hashchange',route);
@@ -1920,6 +1926,29 @@ route();
     status.className='wl-status'+(kind?' wl-status-'+kind:'');
     status.textContent=text;
   }
+  var VISITS={
+    medical:'Nurse Practitioner visit',
+    wellness:'Herbalist & Nutrition visit',
+    integrated:'Integrated visit',
+    'not-sure':'Not sure',
+    notsure:'Not sure'
+  };
+  function visitKey(){
+    var hash=location.hash||'';
+    var q='';
+    var hm=hash.match(/\?([^#]*)/);
+    if(hm)q=hm[1];
+    else if(location.search&&location.search.length>1)q=location.search.slice(1);
+    var key='';
+    try{key=(new URLSearchParams(q).get('visit')||'');}catch(e){key='';}
+    return key.toLowerCase();
+  }
+  function applyVisit(key){
+    var sel=f.querySelector('select[name="interest"]');
+    if(!sel)return;
+    var label=VISITS[key];
+    sel.value=label||'';
+  }
   function showForm(){
     if(sending)return;
     f.reset();
@@ -1972,9 +2001,20 @@ route();
     });
   });
   document.querySelectorAll('[data-modal="waitlist"]').forEach(function(b){
-    b.addEventListener('click',showForm);
+    b.addEventListener('click',function(){
+      showForm();
+      applyVisit(b.getAttribute('data-visit')||visitKey());
+    });
   });
-  if(location.hash==='#waitlist')setTimeout(function(){showForm();openModal('waitlist');},0);
+  function openFromLink(){
+    var hash=(location.hash||'').split('?')[0];
+    if(hash!=='#waitlist')return;
+    showForm();
+    applyVisit(visitKey());
+    openModal('waitlist');
+  }
+  if((location.hash||'').split('?')[0]==='#waitlist')setTimeout(openFromLink,0);
+  addEventListener('hashchange',function(){if((location.hash||'').split('?')[0]==='#waitlist')openFromLink();});
 })();
 </script>
 
