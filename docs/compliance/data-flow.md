@@ -46,3 +46,5 @@ What moves where:
 | Waitlist | The existing Apps Script form | Health details. The form asks people not to include them |
 
 The email confirmation code is sent to the same address as the link. That is not a separate channel. A person who can read the mailbox can read both. The trade-off is recorded in the readiness report.
+
+TODO: a second channel could send that code by SMS to a number the clinic already holds. SMS is not built.

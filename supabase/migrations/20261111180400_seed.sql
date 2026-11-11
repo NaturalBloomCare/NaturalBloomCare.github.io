@@ -1,8 +1,8 @@
 -- Fictional testing accounts and records only.
 -- No real patient, no real health number, no lab result, no diagnosis.
--- Staff password for every active fictional staff account: BloomStaff-Test-2026!
--- Client password for the fictional client: BloomClient-Test-2026!
--- Change or disable these accounts before any real information is stored.
+-- Each account is created with a random sign-in secret. Migration 8 replaces
+-- those secrets again. Set a test password through the password-reset page.
+-- Disable these accounts before any real information is stored.
 -- Iris Calloway, MN, NP and Rosemary Hale are the practitioners named on the
 -- public site. Their registration numbers are TODOs, not invented licences.
 -- Other people in this file are fictional characters from the staff prototype.
@@ -59,38 +59,38 @@ end;
 $$;
 
 select private.seed_login(
-  '11111111-1111-4111-8111-111111111001'::uuid, 'rose.ashby@example.com', 'BloomStaff-Test-2026!',
+  '11111111-1111-4111-8111-111111111001'::uuid, 'rose.ashby@example.com', gen_random_uuid()::text,
   'owner', 'Rose', 'Ashby', 'u-rose', 'Founder and clinic owner (fictional)', 'active', null::jsonb,
   'Signed 2 Jan 2026');
 select private.seed_login(
-  '11111111-1111-4111-8111-111111111002'::uuid, 'ivy.bennett@example.com', 'BloomStaff-Test-2026!',
+  '11111111-1111-4111-8111-111111111002'::uuid, 'ivy.bennett@example.com', gen_random_uuid()::text,
   'admin', 'Ivy', 'Bennett', 'u-ivy', 'Administrative director (fictional)', 'active', null::jsonb,
   'Signed 4 Jan 2026');
 select private.seed_login(
-  '11111111-1111-4111-8111-111111111003'::uuid, 'iris.calloway@example.com', 'BloomStaff-Test-2026!',
+  '11111111-1111-4111-8111-111111111003'::uuid, 'iris.calloway@example.com', gen_random_uuid()::text,
   'medical', 'Iris', 'Calloway', 'u-lilac', 'Nurse Practitioner', 'active',
   '{"type":"NP","label":"MN, NP","reg":"TODO: CRNA registration number","verified":true}'::jsonb,
   'Signed 4 Jan 2026');
 select private.seed_login(
-  '11111111-1111-4111-8111-111111111004'::uuid, 'lavender.hale@example.com', 'BloomStaff-Test-2026!',
+  '11111111-1111-4111-8111-111111111004'::uuid, 'lavender.hale@example.com', gen_random_uuid()::text,
   'medical', 'Lavender', 'Hale', 'u-lavender', 'Nurse Practitioner (fictional)', 'active',
   '{"type":"NP","label":"MN, NP","reg":"TODO: CRNA registration number","verified":true}'::jsonb,
   'Annual renewal due');
 select private.seed_login(
-  '11111111-1111-4111-8111-111111111005'::uuid, 'rosemary.hale@example.com', 'BloomStaff-Test-2026!',
+  '11111111-1111-4111-8111-111111111005'::uuid, 'rosemary.hale@example.com', gen_random_uuid()::text,
   'holistic', 'Rosemary', 'Hale', 'u-sage', 'Herbalist and nutrition specialist', 'active',
   '{"type":"HNS","label":"Herbalist and nutrition","reg":null,"verified":true}'::jsonb,
   'Signed 4 Jan 2026');
 select private.seed_login(
-  '11111111-1111-4111-8111-111111111006'::uuid, 'juniper.reyes@example.com', 'BloomStaff-Test-2026!',
+  '11111111-1111-4111-8111-111111111006'::uuid, 'juniper.reyes@example.com', gen_random_uuid()::text,
   'admin', 'Juniper', 'Reyes', 'u-juniper', 'Patient coordinator (fictional)', 'invited', null::jsonb,
   'Required before first sign-in');
 select private.seed_login(
-  '11111111-1111-4111-8111-111111111007'::uuid, 'hazel.moore@example.com', 'BloomStaff-Test-2026!',
+  '11111111-1111-4111-8111-111111111007'::uuid, 'hazel.moore@example.com', gen_random_uuid()::text,
   'admin', 'Hazel', 'Moore', 'u-hazel', 'Front desk (fictional)', 'deactivated', null::jsonb,
   'Signed 6 Jan 2026');
 select private.seed_login(
-  '22222222-2222-4222-8222-222222222001'::uuid, 'amelia.hart@example.com', 'BloomClient-Test-2026!',
+  '22222222-2222-4222-8222-222222222001'::uuid, 'amelia.hart@example.com', gen_random_uuid()::text,
   'client', 'Amelia', 'Hart', 'c-amelia', 'Client', 'active', null::jsonb,
   '');
 

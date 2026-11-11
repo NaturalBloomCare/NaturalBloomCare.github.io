@@ -58,7 +58,15 @@ begin
   if gate ->> 'status' is distinct from 'ok' then
     raise exception 'the first confirmation code was not accepted';
   end if;
+  perform public.release_secure_link_code('hash-one');
+  if (select code_requests from public.secure_links where token_hash = 'hash-one') <> 0 then
+    raise exception 'a failed email send still counted toward the code limit';
+  end if;
   gate := public.request_secure_link_code('hash-one', 'codehash2');
+  if gate ->> 'status' is distinct from 'ok' then
+    raise exception 'a code could not be requested again after a failed send';
+  end if;
+  gate := public.request_secure_link_code('hash-one', 'codehash3');
   if gate ->> 'status' is distinct from 'throttled' then
     raise exception 'a second confirmation code was not throttled';
   end if;
@@ -85,6 +93,19 @@ begin
 exception
   when insufficient_privilege then
     raise notice 'browsers cannot request a secure-link code directly';
+end $$;
+do $$
+declare
+  n integer;
+begin
+  select count(*) into n from audit.chain;
+  if n <> 0 then
+    raise exception 'the API read the audit chain';
+  end if;
+  raise notice 'the API cannot see the audit chain head';
+exception
+  when insufficient_privilege then
+    raise notice 'the API cannot see the audit chain head';
 end $$;
 reset role;
 

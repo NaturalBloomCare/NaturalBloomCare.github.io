@@ -14,8 +14,9 @@ Apply these files in this order, in the Supabase SQL editor or with `supabase db
 10. `supabase/migrations/20261111180900_audit_integrity.sql`
 11. `supabase/migrations/20261111181000_published_plan_version.sql`
 12. `supabase/migrations/20261111181100_secure_link_throttle.sql`
+13. `supabase/migrations/20261111181200_audit_chain_rls_and_code_release.sql`
 
-Migrations 1–7 are already applied on the live project. Apply 8–12 after them, in this order. Do not edit a migration that has already been applied.
+Migrations 1–12 are already applied on the live project. Apply 13 after them. The seed file no longer contains a sign-in secret. Migration 8 is what replaced the live passwords.
 
 Then deploy the Edge Functions:
 
@@ -23,9 +24,9 @@ Then deploy the Edge Functions:
 - `supabase/functions/document-url`
 - `supabase/functions/open-secure-link`
 
-After migration 12, redeploy `document-url` and `open-secure-link`. Downloads are recorded by `record_document_download`, and a secure-link code request is throttled by `request_secure_link_code`.
+After migration 13, redeploy `open-secure-link`. A code request is throttled by `request_secure_link_code`. If the email provider rejects the send, `release_secure_link_code` gives that attempt back so it does not count toward the eight-request limit.
 
-The seed is fictional and marked testing. Migration 8 replaces every `@example.com` password with a random value that cannot be used to sign in, and it replaces stored health numbers with obviously invalid samples such as `00000-0001`. Set a test password privately through the password-reset page. Do not copy a password out of an older migration file. The applied seed file is left as it was applied.
+The seed is fictional and marked testing. Migration 8 replaces every `@example.com` password with a random value that cannot be used to sign in, and it replaces stored health numbers with obviously invalid samples such as `00000-0001`. Set a test password privately through the password-reset page.
 
 After the SQL is applied, turn on two Authentication hooks or lockout and live role claims will not run:
 

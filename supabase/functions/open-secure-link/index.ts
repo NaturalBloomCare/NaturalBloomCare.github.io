@@ -48,7 +48,10 @@ Deno.serve(async (req) => {
     }
     const sent = await sendCode(provider, apiKey, from, String(gate.data.email || ''), next)
     logStatus('secure-link', sent ? 'code_sent' : 'failed', found.data.document_id)
-    if (!sent) return json({ status: 'failed', message: 'The confirmation code could not be sent.' }, 502)
+    if (!sent) {
+      await admin.rpc('release_secure_link_code', { p_token_hash: tokenHash })
+      return json({ status: 'failed', message: 'The confirmation code could not be sent.' }, 502)
+    }
     return json({ status: 'code_sent', message: 'A six-digit code was sent to the same address. It is not a second channel, so a person who can read that mailbox can also read the code.' })
   }
 
