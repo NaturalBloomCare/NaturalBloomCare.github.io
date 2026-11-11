@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://yaehgbbuyzfpkjpdqlzs.supabase.co wss://yaehgbbuyzfpkjpdqlzs.supabase.co; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light only">
+<title>Bloom — Set a new password</title>
+<link rel="stylesheet" href="/assets/fonts.css">
+<link rel="stylesheet" href="/portal/portal.css">
+</head>
+<body>
+<main class="wrap" style="padding-top:72px;max-width:560px">
+  <a class="brand" href="/">BLOOM</a>
+  <h1 style="margin-top:28px">Set a new <em>password.</em></h1>
+  <p class="lede" id="lead">Open the link in your reset email on this page. Then choose a new password.</p>
+  <p class="err" id="err" hidden></p>
+  <form id="form" hidden>
+    <div class="field"><label for="pw">New password</label><input class="input" id="pw" type="password" autocomplete="new-password" minlength="12" required></div>
+    <button class="cta cta-solid" type="submit" style="margin-top:18px">Save password</button>
+  </form>
+  <p class="small" id="done" hidden style="margin-top:18px">Password saved. You can close this page and sign in.</p>
+</main>
+<script src="/assets/bloom-config.js"></script>
+<script src="/assets/vendor/supabase.js"></script>
+<script src="/auth/reset.js"></script>
+
+</body>
+</html>
