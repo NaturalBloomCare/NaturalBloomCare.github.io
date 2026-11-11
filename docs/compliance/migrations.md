@@ -15,8 +15,9 @@ Apply these files in this order, in the Supabase SQL editor or with `supabase db
 11. `supabase/migrations/20261111181000_published_plan_version.sql`
 12. `supabase/migrations/20261111181100_secure_link_throttle.sql`
 13. `supabase/migrations/20261111181200_audit_chain_rls_and_code_release.sql`
+14. `supabase/migrations/20261111181300_portal_access_list.sql`
 
-Migrations 1–12 are already applied on the live project. Apply 13 after them. The seed file no longer contains a sign-in secret. Migration 8 is what replaced the live passwords.
+Migrations 1–13 are already applied on the live project. Migration 14 is not applied yet. Review it before applying. It does not create users. After it is applied, turn the custom access token hook on and set a short JWT expiry. Clover then syncs the sheet with `private.apply_access_list` using the service role. The seed file no longer contains a sign-in secret. Migration 8 is what replaced the live passwords.
 
 Then deploy the Edge Functions:
 
@@ -28,11 +29,13 @@ After migration 13, redeploy `open-secure-link`. A code request is throttled by 
 
 The seed is fictional and marked testing. Migration 8 replaces every `@example.com` password with a random value that cannot be used to sign in, and it replaces stored health numbers with obviously invalid samples such as `00000-0001`. Set a test password privately through the password-reset page.
 
-After the SQL is applied, turn on the custom access token hook or live role claims will not run:
+After migration 14 is applied, turn on the custom access token hook or the access list and live role claims will not run:
 
 - Custom access token → `public.custom_access_token_hook`
 
-The Password Verification Attempt hook (`public.hook_password_verification_attempt`) cannot be enabled on the current Pro plan. Supabase reserves that hook for the Team plan. Until then, per-account lockout and failed-login auditing are not active. The controls that still apply are no public sign-ups, leaked-password protection, staff TOTP MFA, Supabase Auth rate limits, the 15-minute idle timeout, and `private.profile_active()` checks.
+That hook is the sign-in allowlist. It refuses anyone who is unlisted, inactive, deactivated, on the wrong portal, or in the wrong staff role. Because it also runs on refresh, set JWT expiry short so removal takes effect quickly.
+
+The Password Verification Attempt hook (`public.hook_password_verification_attempt`) cannot be enabled on the current Pro plan. Supabase reserves that hook for the Team plan. Until then, the five-failure lockout and failed-password auditing are not active. The controls that still apply are no public sign-ups, leaked-password protection, staff TOTP MFA, Supabase Auth rate limits, the 15-minute idle timeout, `private.profile_active()`, and, once migration 14 and the custom access token hook are on, the access list.
 
 Add these redirect URLs in Authentication:
 

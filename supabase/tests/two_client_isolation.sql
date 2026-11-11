@@ -5,6 +5,16 @@
 
 begin;
 
+insert into private.portal_access (email, full_name, portal, staff_role, status, date_added)
+select lower(u.email), p.first_name || ' ' || p.last_name,
+  case when p.portal_role = 'client' then 'client' else 'staff' end,
+  case when p.portal_role = 'client' then null else p.portal_role end,
+  'active', current_date
+from public.profiles p
+join auth.users u on u.id = p.id
+where p.status = 'active'
+  and not exists (select 1 from private.portal_access a where a.email = lower(u.email));
+
 do $$
 declare
   users integer;

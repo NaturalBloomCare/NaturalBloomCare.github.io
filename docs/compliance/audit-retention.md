@@ -18,7 +18,9 @@ Writes of patient tables also fire `audit.row_change`. Reads of the workspace an
 
 Each audit row stores the previous row’s hash. The head of that chain lives on one `audit.chain` row, which `audit.stamp` locks until the writing transaction commits. Row level security is on for `audit.chain` and there is no policy, so the API cannot read or write the head. Two concurrent writes therefore continue from the same head, including when a row id was allocated before the writer obtained the lock. The hash covers the actor, action, record, information type, detail and time.
 
-Failed passwords, lockouts, and sign-in blocks for deactivated or invited accounts are not written today. `hook_password_verification_attempt` would write those rows, but the Password Verification Attempt hook cannot be enabled on the Pro plan. It needs the Team plan. Until then this is a documented gap. The password itself is not stored.
+Failed passwords and the five-failure lock are not written today. `hook_password_verification_attempt` would write those rows, but that hook cannot be enabled on the Pro plan. It needs the Team plan. Until then this is a documented gap. The password itself is not stored.
+
+Once migration 14 is applied and the custom access token hook is on, a refused sign-in writes `Sign-in blocked` with the detail `Not on access list`. The email address is not copied into that detail. Sheet sync writes `Updated access list` for each change, again without the email address.
 
 Tracking deletion nulls the value and the note, then writes “Deleted tracking entry” with the row id.
 

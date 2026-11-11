@@ -13,6 +13,13 @@
   function authPatch(patch) {
     if (window.BloomSetAuth) window.BloomSetAuth(patch);
   }
+  function signInMessage(error, fallback) {
+    var message = error && error.message ? String(error.message) : '';
+    if ((error && error.status === 403) || /not on the bloom access list/i.test(message)) {
+      return "This account isn't on the Bloom access list. Please contact the clinic.";
+    }
+    return message || fallback;
+  }
   function fail(message) {
     authPatch({ step: 'login', err: message });
     if (api()) api().render();
@@ -21,7 +28,7 @@
   async function password(email, passwordValue) {
     var res = await sb.auth.signInWithPassword({ email: email, password: passwordValue });
     if (res.error) {
-      authPatch({ err: res.error.message || 'That email and password do not match a staff account. After 5 failed attempts the account locks for 15 minutes.' });
+      authPatch({ err: signInMessage(res.error, 'That email and password do not match a staff account. After 5 failed attempts the account locks for 15 minutes.') });
       api().render();
       return;
     }
