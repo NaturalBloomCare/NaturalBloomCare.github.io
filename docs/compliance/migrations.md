@@ -8,6 +8,7 @@ Apply these files in this order, in the Supabase SQL editor or with `supabase db
 4. `supabase/migrations/20261111180300_storage.sql`
 5. `supabase/migrations/20261111180400_seed.sql`
 6. `supabase/migrations/20261111180500_secure_links.sql`
+7. `supabase/migrations/20261111180600_lock_direct_writes.sql`
 
 Then deploy the Edge Functions:
 

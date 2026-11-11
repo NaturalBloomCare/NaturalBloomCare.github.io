@@ -1,6 +1,7 @@
-import { adminClient, json, logStatus, userClient } from '../_shared/supabase.ts'
+import { adminClient, json, logStatus, optionsResponse, userClient } from '../_shared/supabase.ts'
 
 Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') return optionsResponse()
   if (req.method !== 'POST') return json({ status: 'error', message: 'POST only' }, 405)
   const sb = userClient(req)
   const { data: userData, error: userError } = await sb.auth.getUser()

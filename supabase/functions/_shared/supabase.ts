@@ -14,11 +14,21 @@ export function adminClient(): SupabaseClient | null {
   return createClient(url, key)
 }
 
+export const corsHeaders: Record<string, string> = {
+  'access-control-allow-origin': 'https://naturalbloom.ca',
+  'access-control-allow-headers': 'authorization, content-type, apikey',
+  'access-control-allow-methods': 'POST, OPTIONS'
+}
+
 export function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { 'content-type': 'application/json' }
+    headers: { 'content-type': 'application/json', ...corsHeaders }
   })
+}
+
+export function optionsResponse(): Response {
+  return new Response('ok', { headers: corsHeaders })
 }
 
 /** Log a status only. Never log names, numbers, or document text. */

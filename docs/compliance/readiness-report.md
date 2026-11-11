@@ -14,7 +14,7 @@ Checklist sections 1, 5, 6 and 7 are mostly legal, contractual or operational. T
 | Production project in Canada Central | NEEDS MANUAL VERIFICATION | The brief names `ca-central-1`. This repo cannot read the project region. Confirm in the Supabase dashboard. |
 | Where records, auth, files, backups and logs are processed | NEEDS MANUAL VERIFICATION | Schema and bucket are created for the linked project. Backup region and support access are a Supabase contract question. |
 | Encryption in transit and at rest | NEEDS MANUAL VERIFICATION | The browser uses `https://yaehgbbuyzfpkjpdqlzs.supabase.co`. At-rest encryption is a platform control, not a setting in this repo. |
-| RLS on every patient-data table | PASS | `20261111180000_foundation.sql` enables RLS on patients, contacts’ parent tables, appointments, documents, disclosures, incidents, wellness plans and versions, tracking, library, profiles and the audit table. `patients`, `tracking_entries`, `wellness_plans`, `generated_documents`, `disclosures` and `appointments` also use `FORCE ROW LEVEL SECURITY`. |
+| RLS on every patient-data table | PASS | `20261111180000_foundation.sql` enables RLS on the public patient tables. `20261111180600_lock_direct_writes.sql` enables RLS with no API policy on `private.patient_contact`, `private.patient_identifiers`, `private.login_attempts` and `private.session_touch`. Direct updates of `profiles`, `wellness_plans` and `patients` are revoked. |
 | Patient-level and clinic-level access | PASS | `private.can_see_patient` and the policies. Local test: the fictional NP Iris saw three assigned patients; Rosemary did not see the medical-only patient; the owner payload had blank date of birth and email. |
 | MFA for administrators and clinical staff | PASS in the database and the staff UI | `private.assurance_ok` requires `aal2` for staff. `staff_bootstrap` raises without it. Local test: the same NP at `aal1` was rejected. The staff UI enrols TOTP. The password hook must still be enabled for lockout. MFA enrolment itself works without that hook. |
 | Secure authentication and session expiration | PASS for idle timeout. NEEDS MANUAL VERIFICATION for JWT lifetime | `touch_session` and `private.session_ok`. Browser idle sign-out uses the clinic setting, default 15 minutes. JWT expiry is a dashboard setting this repo cannot change. |
@@ -31,9 +31,9 @@ Checklist sections 1, 5, 6 and 7 are mostly legal, contractual or operational. T
 | --- | --- | --- |
 | Wellness separated from clinical care plans | PASS | No tables for diagnoses, labs, notes, prescriptions or NP treatment plans. `reject_clinical_wellness` blocks those keys. Client Results and clinical Care plan screens are a Jane handoff. |
 | Source and responsible clinician | PASS for wellness notes | `wellness_plans.responsible_clinician_id`. Clinical plans are not stored, so they have no row here. They remain in Jane. |
-| NP approval before publishing | PASS | Status `Published` requires `approved_by` and `published_by`. The medical role is the publisher in `staff_commit`. |
+| NP approval before publishing | PASS | `approve_wellness_plan` is the only publish path. It requires a verified NP credential and sets `approved_by` and `published_by` to `auth.uid()`. A herbalist cannot set those statuses. Direct table writes are revoked. |
 | Patient sees only their records | PASS | Client policy and `client_home` use `private.my_patient()`. |
-| Patients cannot edit clinician notes | PASS | No update policy for `portal_role = client` on `wellness_plans`. |
+| Patients cannot edit clinician notes | PASS | `authenticated` has no insert or update grant on `wellness_plans`. A client also cannot update `profiles.portal_role` or `cred`. |
 | Created, modified, approved, published | PASS | Those columns are on `wellness_plans`. |
 | Version history | PASS | `wellness_plan_versions`, append-only. |
 | Patient-entered data is labelled | PASS | `source` is forced to `patient-entered`. The client UI says the entries are not verified clinical data. |

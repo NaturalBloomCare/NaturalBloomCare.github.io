@@ -103,8 +103,16 @@
   async function push() {
     var S = window.BloomState && window.BloomState();
     if (!S) return;
+    var role = window.BloomAPI && window.BloomAPI.me() ? window.BloomAPI.me().role : '';
+    var toPublish = [];
     var wellness = (window.BloomPlans ? window.BloomPlans() : []).filter(function (p) { return p.type === 'wellness'; }).map(function (p) {
-      return { id: p.id, pid: p.pid, type: 'wellness', kind: p.kind, date: p.date, status: (S.planMeta && S.planMeta[p.id] && S.planMeta[p.id].status) || p.status, body: (S.drafts && S.drafts[p.id]) || {} };
+      var status = (S.planMeta && S.planMeta[p.id] && S.planMeta[p.id].status) || p.status;
+      if ((status === 'Approved' || status === 'Published') && role === 'medical') {
+        toPublish.push({ id: p.id, status: status });
+        status = (p.status === 'Draft' || p.status === 'Ready for Review') ? p.status : 'Ready for Review';
+      }
+      if (status !== 'Draft' && status !== 'Ready for Review') status = 'Draft';
+      return { id: p.id, pid: p.pid, type: 'wellness', kind: p.kind, date: p.date, status: status, body: (S.drafts && S.drafts[p.id]) || {} };
     });
     var payload = {
       clinic: S.clinic, timeout: S.timeout, newDays: S.newDays, staff: S.staff, reqs: S.reqs,
@@ -113,6 +121,10 @@
     };
     var res = await sb.rpc('staff_commit', { payload: payload });
     if (res.error && window.BloomAPI) window.BloomAPI.toast(res.error.message);
+    for (var i = 0; i < toPublish.length; i++) {
+      var pub = await sb.rpc('approve_wellness_plan', { p_legacy_id: toPublish[i].id, p_status: toPublish[i].status });
+      if (pub.error && window.BloomAPI) window.BloomAPI.toast(pub.error.message);
+    }
   }
 
   window.BloomForms = {

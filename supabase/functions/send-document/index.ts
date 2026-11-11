@@ -24,12 +24,29 @@ Deno.serve(async (req) => {
     return json({ status: 'error', message: 'Choose portal, email, or fax.' }, 400)
   }
 
+  const { data: profile } = await sb.from('profiles').select('id, portal_role').eq('id', userData.user.id).maybeSingle()
+  if (!profile || (profile.portal_role !== 'admin' && profile.portal_role !== 'medical')) {
+    logStatus('send', 'forbidden', documentId)
+    return json({ status: 'forbidden', message: 'Only administration or an assigned medical practitioner can send a document.' }, 403)
+  }
+
   const { data: doc, error: docError } = await sb
     .from('generated_documents')
     .select('id, patient_id, template_name, storage_path')
     .eq('id', documentId)
     .maybeSingle()
   if (docError || !doc) return json({ status: 'forbidden' }, 403)
+
+  const { data: patient } = await sb
+    .from('patients')
+    .select('id, np_profile_id, hns_profile_id')
+    .eq('id', doc.patient_id)
+    .maybeSingle()
+  if (!patient) return json({ status: 'forbidden' }, 403)
+  if (profile.portal_role === 'medical' && patient.np_profile_id !== userData.user.id && patient.hns_profile_id !== userData.user.id) {
+    logStatus('send', 'not_assigned', documentId)
+    return json({ status: 'forbidden', message: 'This patient is not assigned to you.' }, 403)
+  }
 
   if (channel === 'portal') {
     const released = await sb.rpc('release_document', { p_id: documentId })
