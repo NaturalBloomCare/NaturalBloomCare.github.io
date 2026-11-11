@@ -8,7 +8,9 @@ Staff must reach authenticator assurance level `aal2` before `staff_bootstrap` r
 
 Clients may enrol TOTP from Profile. If they have a verified factor, row checks require `aal2` as well. If they have not enrolled, `aal1` is enough for their own portal.
 
-Deactivated and invited accounts are rejected by `hook_password_verification_attempt` once that hook is enabled in the Supabase dashboard. Five failed passwords in 15 minutes lock the account for 15 minutes. The hook has to be selected in Authentication → Hooks or GoTrue will not call it.
+Public sign-up stays off. Leaked-password protection and Supabase Auth rate limits are dashboard controls. Staff must pass TOTP before any record opens. The browser signs out after the 15-minute idle timeout. `private.profile_active()` allows data access only when the profile status is `active`, so a deactivated or invited account that still holds a session cannot read patient rows.
+
+Per-account lockout and failed-login auditing are not active. `hook_password_verification_attempt` would record a failed password, lock an account after five failures in 15 minutes, and reject deactivated and invited accounts at sign-in. Supabase offers that Password Verification Attempt hook on the Team plan only. This project is on Pro, so the hook cannot be turned on. That is a documented gap until the plan includes it. The function remains in the database and does nothing until the hook can be selected.
 
 `custom_access_token_hook` copies `portal_role` from `public.profiles` into `app_metadata`. Policies read that claim, not `user_metadata`, because users can edit the latter.
 

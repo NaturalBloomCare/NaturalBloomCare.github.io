@@ -18,7 +18,7 @@ Writes of patient tables also fire `audit.row_change`. Reads of the workspace an
 
 Each audit row stores the previous row’s hash. The head of that chain lives on one `audit.chain` row, which `audit.stamp` locks until the writing transaction commits. Row level security is on for `audit.chain` and there is no policy, so the API cannot read or write the head. Two concurrent writes therefore continue from the same head, including when a row id was allocated before the writer obtained the lock. The hash covers the actor, action, record, information type, detail and time.
 
-Failed passwords are written by the password hook: failed sign-in, lock, deactivated, invited. The password itself is not stored.
+Failed passwords, lockouts, and sign-in blocks for deactivated or invited accounts are not written today. `hook_password_verification_attempt` would write those rows, but the Password Verification Attempt hook cannot be enabled on the Pro plan. It needs the Team plan. Until then this is a documented gap. The password itself is not stored.
 
 Tracking deletion nulls the value and the note, then writes “Deleted tracking entry” with the row id.
 
@@ -36,4 +36,4 @@ Account closure is not a delete button. Deactivating a staff profile blocks sign
 
 ## Review
 
-`security_summary` returns counts of recent failed sign-ins, current locks and denied audit events to the owner. It does not return passwords or clinical text. A named person still has to read the log on a schedule. That person is not appointed here. The privacy officer field is `TODO: Privacy Officer name`.
+`security_summary` can count recent failed sign-ins, current locks and denied audit events for the owner. Failed sign-ins and locks stay empty while the password hook cannot run. Denied audit events from the portal still appear. It does not return passwords or clinical text. A named person still has to read the log on a schedule. That person is not appointed here. The privacy officer field is `TODO: Privacy Officer name`.

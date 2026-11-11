@@ -28,10 +28,11 @@ After migration 13, redeploy `open-secure-link`. A code request is throttled by 
 
 The seed is fictional and marked testing. Migration 8 replaces every `@example.com` password with a random value that cannot be used to sign in, and it replaces stored health numbers with obviously invalid samples such as `00000-0001`. Set a test password privately through the password-reset page.
 
-After the SQL is applied, turn on two Authentication hooks or lockout and live role claims will not run:
+After the SQL is applied, turn on the custom access token hook or live role claims will not run:
 
-- Password verification attempt → `public.hook_password_verification_attempt`
 - Custom access token → `public.custom_access_token_hook`
+
+The Password Verification Attempt hook (`public.hook_password_verification_attempt`) cannot be enabled on the current Pro plan. Supabase reserves that hook for the Team plan. Until then, per-account lockout and failed-login auditing are not active. The controls that still apply are no public sign-ups, leaked-password protection, staff TOTP MFA, Supabase Auth rate limits, the 15-minute idle timeout, and `private.profile_active()` checks.
 
 Add these redirect URLs in Authentication:
 

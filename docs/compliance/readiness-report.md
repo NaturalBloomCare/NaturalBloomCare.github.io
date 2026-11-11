@@ -16,7 +16,7 @@ Checklist sections 1, 5, 6 and 7 are mostly legal, contractual or operational. T
 | Encryption in transit and at rest | NEEDS MANUAL VERIFICATION | The browser uses `https://yaehgbbuyzfpkjpdqlzs.supabase.co`. At-rest encryption is a platform control, not a setting in this repo. |
 | RLS on every patient-data table | PASS | `20261111180000_foundation.sql` enables RLS on the public patient tables. `20261111180600_lock_direct_writes.sql` enables RLS with no API policy on `private.patient_contact`, `private.patient_identifiers`, `private.login_attempts` and `private.session_touch`. Direct updates of `profiles`, `wellness_plans` and `patients` are revoked. |
 | Patient-level and clinic-level access | PASS | `private.can_see_patient` and the policies. Local test: the fictional NP Iris saw three assigned patients; Rosemary did not see the medical-only patient; the owner payload had blank date of birth and email. |
-| MFA for administrators and clinical staff | PASS in the database and the staff UI | `private.assurance_ok` requires `aal2` for staff. `staff_bootstrap` raises without it. Local test: the same NP at `aal1` was rejected. The staff UI enrols TOTP. The password hook must still be enabled for lockout. MFA enrolment itself works without that hook. |
+| MFA for administrators and clinical staff | PASS in the database and the staff UI | `private.assurance_ok` requires `aal2` for staff. `staff_bootstrap` raises without it. Local test: the same NP at `aal1` was rejected. The staff UI enrols TOTP. Per-account lockout is a separate gap: the Password Verification Attempt hook needs the Team plan and is not active on Pro. |
 | Secure authentication and session expiration | PASS for idle timeout. NEEDS MANUAL VERIFICATION for JWT lifetime | `touch_session` and `private.session_ok`. Browser idle sign-out uses the clinic setting, default 15 minutes. JWT expiry is a dashboard setting this repo cannot change. |
 | No privileged key in the frontend | PASS | `assets/bloom-config.js` has the publishable key only. The service-role key is read inside Edge Functions from the platform environment and is not assigned in HTML or browser JavaScript. |
 | Secrets in a secret store | NEEDS MANUAL VERIFICATION | Secrets are named for the dashboard. They are not committed. Someone still has to set them. |
@@ -48,7 +48,7 @@ Checklist sections 1, 5, 6 and 7 are mostly legal, contractual or operational. T
 | User, time, action, record id | PASS | `audit.events` columns `actor_id`, `at`, `action`, `record_id`. |
 | Tamper resistance | PASS as a control, not as a guarantee against a superuser | Update and delete raise. Each row stores `prev_hash` and `row_hash`. |
 | Retention period | NEEDS MANUAL VERIFICATION | The log is not auto-deleted. Ten years is the clinic’s stated target and is not implemented as a job. See `audit-retention.md`. |
-| Failed login monitoring | PASS once the hook is enabled. NEEDS MANUAL VERIFICATION until then | `hook_password_verification_attempt` and `security_summary`. The hook does nothing until it is selected in the dashboard. |
+| Failed login monitoring | GAP until the Team plan | `hook_password_verification_attempt` would write failed sign-ins and locks, and `security_summary` would count them. Supabase blocks the Password Verification Attempt hook on Pro. It is not active. Remaining controls: no public sign-ups, leaked-password protection, staff TOTP MFA, Supabase Auth rate limits, the 15-minute idle timeout, and `private.profile_active()`. |
 | Breach detection and escalation | PARTIAL | The staff privacy-incident form writes `public.incidents`. It does not page anyone. Notification steps are in the staff checklist text and need a named privacy officer. |
 | Breach procedure documented | NEEDS MANUAL VERIFICATION | The portal describes the duty. It does not appoint the officer or file the notices. |
 | Security and privacy testing before launch | NEEDS MANUAL VERIFICATION | Local SQL role checks were run. No penetration test was run. |
@@ -71,6 +71,6 @@ These are decisions for the clinic, not things this build silently resolved.
 - CRNA registration numbers for Iris Calloway and any other NP. The field is a TODO. The testing seed marks the credential verified so the role can be exercised. That is not a college verification.
 - Street address, phone and fax. They are TODOs.
 - Jane portal URL. It is blank on purpose.
-- Enable the two Auth hooks, shorten JWT expiry, allow the reset URLs, run Security Advisor, and test a backup restore.
+- Enable the custom access token hook, shorten JWT expiry, allow the reset URLs, run Security Advisor, and test a backup restore. The Password Verification Attempt hook stays off until the project is on the Team plan. Per-account lockout and failed-login auditing are a documented gap until then.
 - Turn off the fictional accounts before any real chart exists.
 - Do not describe the portal as HIA or PIPA compliant in public material.
