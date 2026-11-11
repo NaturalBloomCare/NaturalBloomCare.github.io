@@ -856,13 +856,15 @@ footer a:hover{color:var(--bone)}
 .lib-credits{font-size:.75rem;line-height:1.55;color:var(--muted);margin:22px 0 0;max-width:62rem}
 .lib-credits a{color:var(--burgundy)}
 /* library search and category filter */
-.lib-toolbar{position:relative;z-index:4;display:flex;align-items:flex-end;justify-content:space-between;gap:28px 48px;margin-bottom:48px}
-.lib-toolbar .page-head{margin-bottom:0;max-width:640px;flex:1 1 auto}
-.lib-tools{position:relative;display:flex;align-items:stretch;flex:0 1 440px;width:min(100%,440px);background:var(--bone);border-radius:18px;box-shadow:inset 4px 4px 10px var(--sd),inset -4px -4px 10px var(--sl)}
-.lib-tools:focus-within{box-shadow:inset 4px 4px 10px var(--sd),inset -4px -4px 10px var(--sl),0 0 0 1px var(--gold)}
+.lib-toolbar{position:relative;z-index:4;margin-bottom:48px}
+.lib-toolbar .page-head{margin-bottom:0;max-width:none}
+.lib-lede-row{display:flex;align-items:flex-start;justify-content:space-between;gap:28px 48px}
+.lib-lede-row .lede{margin:0;flex:1 1 auto;max-width:520px}
+.lib-tools{position:relative;display:flex;align-items:stretch;flex:0 1 440px;width:min(100%,440px);margin-top:0;background:var(--bone);border-radius:18px;box-shadow:inset 4px 4px 10px var(--sd),inset -4px -4px 10px var(--sl)}
 .lib-search{display:flex;align-items:center;gap:8px;flex:1 1 auto;min-width:0;padding-left:16px}
 .lib-search svg{width:16px;height:16px;flex:none;color:var(--muted)}
-.lib-search-input{flex:1;min-width:0;width:100%;border:0;background:transparent;font-family:var(--sans);font-weight:300;font-size:1rem;color:var(--ink);padding:14px 8px 14px 0;outline:none;letter-spacing:.01em}
+.lib-search-input{flex:1;min-width:0;width:100%;border:0;background:transparent;font-family:var(--sans);font-weight:300;font-size:1rem;color:var(--ink);padding:14px 8px 14px 0;outline:none;box-shadow:none;letter-spacing:.01em}
+.lib-search-input:focus,.lib-search-input:focus-visible{outline:none;box-shadow:none}
 .lib-search-input::placeholder{color:var(--muted)}
 .lib-search-input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none;height:14px;width:14px;cursor:pointer;background:center / 14px 14px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%237a726a' stroke-width='1.4'%3E%3Cpath d='M4 4l8 8M12 4L4 12'/%3E%3C/svg%3E")}
 .lib-cat{position:relative;display:flex;flex:none}
@@ -876,14 +878,15 @@ footer a:hover{color:var(--bone)}
 .lib-cat-panel label{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;font-size:.95rem;font-weight:300;color:var(--ink);cursor:pointer}
 .lib-cat-panel label:hover{background:rgba(216,196,154,.2)}
 .lib-cat-panel input{width:16px;height:16px;accent-color:var(--burgundy);flex:none}
-.lib-cat-btn:focus-visible,.lib-search-input:focus-visible,.lib-cat-panel label:focus-within{outline:2px solid var(--burgundy);outline-offset:2px;border-radius:8px}
+.lib-cat-btn:focus-visible,.lib-cat-panel label:focus-within{outline:2px solid var(--burgundy);outline-offset:2px;border-radius:8px}
+.lib-grid mark{background:rgba(243,231,190,.95);color:inherit;border-radius:2px;padding:0 .08em}
+.lib-snippet{margin:2px 0 0;color:var(--ink-soft)}
 .lib-status{margin:0 0 28px;font-family:var(--serif);font-style:italic;font-size:1.45rem;line-height:1.35;color:var(--ink-soft);text-align:center}
 .lib-status[data-quiet]{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .lib-grid .res[hidden]{display:none !important}
 .lib-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media (max-width:860px){
-  .lib-toolbar{flex-direction:column;align-items:stretch;gap:22px}
-  .lib-toolbar .page-head{max-width:none}
+  .lib-lede-row{flex-direction:column;align-items:stretch;gap:22px}
   .lib-tools{width:100%;flex-basis:auto}
 }
 @media (max-width:420px){
@@ -1437,12 +1440,12 @@ footer a:hover{color:var(--bone)}
       <div class="page-head reveal">
         <div class="eyebrow">Library</div>
         <h1>The Bloom <em>library.</em></h1>
+        <div class="lib-lede-row">
         <p class="lede">Guides, recipes and everyday practices from our practitioners, written to help you understand your health and care for yourself well.</p>
-      </div>
       <form class="lib-tools" role="search" aria-label="Filter library articles">
         <label class="lib-search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16.5L20 20.5"/></svg>
-          <span class="lib-sr">Search articles by title or excerpt</span>
+          <span class="lib-sr">Search articles by title, excerpt, or full text</span>
           <input class="lib-search-input" type="search" placeholder="Search articles" autocomplete="off" enterkeyhint="search">
         </label>
         <div class="lib-cat">
@@ -1464,6 +1467,8 @@ footer a:hover{color:var(--bone)}
           </div>
         </div>
       </form>
+        </div>
+      </div>
     </div>
     <p class="lib-status" id="lib-status" data-quiet aria-live="polite"></p>
     <!-- Illustrative AI-generated imagery for the six Library articles, cropped from 16:9 to 16:10. Not a photograph of a patient, a practitioner, or a laboratory result. -->
@@ -1494,6 +1499,78 @@ footer a:hover{color:var(--bone)}
   var allBox=panel.querySelector('[data-all]');
   var boxes=[].slice.call(panel.querySelectorAll('[data-cat]'));
   var used=false;
+  var bodyIndex={};
+  var SYNONYMS=[
+    ['sleep','rest'],
+    ['hydration','water'],
+    ['nutrition','eating','food'],
+    ['gut','digestion','digestive'],
+    ['stress','calm']
+  ];
+  cards.forEach(function(card){
+    var link=card.querySelector('h3 a');
+    var blurb=card.querySelector('h3 + p');
+    card._title=link.textContent;
+    card._excerpt=blurb.textContent;
+    card._href=link.getAttribute('href');
+    var snip=document.createElement('p');
+    snip.className='lib-snippet small';
+    snip.hidden=true;
+    blurb.insertAdjacentElement('afterend',snip);
+    card._snippet=snip;
+  });
+  function escapeHtml(s){return s.replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function escapeRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
+  function groupFor(token){
+    var t=token.toLowerCase();
+    if(t.length<3)return [t];
+    for(var i=0;i<SYNONYMS.length;i++){
+      var g=SYNONYMS[i];
+      if(g.indexOf(t)!==-1)return g.slice();
+    }
+    return [t];
+  }
+  function typedHits(text,token){
+    return new RegExp('(^|[^a-z])'+escapeRe(token),'i').test(text||'');
+  }
+  function synonymHits(text,word){
+    return new RegExp('(^|[^a-z])'+escapeRe(word)+'(s|es|ed|ing)?([^a-z]|$)','i').test(text||'');
+  }
+  function tokenHits(text,token){
+    if(typedHits(text,token))return true;
+    return groupFor(token).some(function(n){return n!==token&&synonymHits(text,n)});
+  }
+  function wordMarked(word,tokens){
+    var low=word.toLowerCase();
+    return tokens.some(function(tok){
+      if(low.indexOf(tok)===0)return true;
+      return groupFor(tok).some(function(n){return n!==tok&&new RegExp('^'+escapeRe(n)+'(s|es|ed|ing)?$','i').test(low)});
+    });
+  }
+  function highlight(text,tokens){
+    if(!tokens.length)return escapeHtml(text);
+    return text.split(/(\b[\w’']+\b)/).map(function(part){
+      if(!/^[\w’']+$/.test(part))return escapeHtml(part);
+      return wordMarked(part,tokens)?'<mark>'+escapeHtml(part)+'</mark>':escapeHtml(part);
+    }).join('');
+  }
+  function snippetFor(body,tokens){
+    if(!body)return '';
+    var parts=body.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[body];
+    for(var i=0;i<parts.length;i++){
+      var sentence=parts[i].replace(/\s+/g,' ').trim();
+      if(!sentence||!tokens.every(function(tok){return tokenHits(sentence,tok)}))continue;
+      if(sentence.length>220){
+        var low=sentence.toLowerCase();
+        var at=low.indexOf(tokens[0]);
+        var start=Math.max(0,at-70);
+        var end=Math.min(sentence.length,Math.max(start+180,at+tokens[0].length+40));
+        sentence=(start>0?'…':'')+sentence.slice(start,end).trim()+(end<sentence.length?'…':'');
+      }
+      return sentence;
+    }
+    return '';
+  }
   function setOpen(open){
     button.setAttribute('aria-expanded',open?'true':'false');
     panel.hidden=!open;
@@ -1509,13 +1586,36 @@ footer a:hover{color:var(--bone)}
   }
   function apply(){
     var q=input.value.trim().toLowerCase();
+    var tokens=q.split(/\s+/).filter(Boolean);
     var cats=chosen().map(function(b){return b.value});
     var shown=0;
     cards.forEach(function(card){
-      var title=(card.querySelector('h3').textContent||'').toLowerCase();
-      var excerpt=(card.querySelector('h3+p').textContent||'').toLowerCase();
-      var ok=cats.indexOf(card.getAttribute('data-category'))!==-1&&(!q||title.indexOf(q)!==-1||excerpt.indexOf(q)!==-1);
+      var link=card.querySelector('h3 a');
+      var blurb=card.querySelector('h3 + p');
+      var body=bodyIndex[card._href]||'';
+      var titleHit=!tokens.length||tokens.every(function(tok){return tokenHits(card._title,tok)});
+      var excerptHit=!tokens.length||tokens.every(function(tok){return tokenHits(card._excerpt,tok)});
+      var blob=card._title+'\n'+card._excerpt+'\n'+body;
+      var textHit=!tokens.length||tokens.every(function(tok){return tokenHits(blob,tok)});
+      var ok=cats.indexOf(card.getAttribute('data-category'))!==-1&&textHit;
       card.hidden=!ok;
+      if(tokens.length&&ok){
+        link.innerHTML=highlight(card._title,tokens);
+        blurb.innerHTML=highlight(card._excerpt,tokens);
+        if(!titleHit&&!excerptHit){
+          var snip=snippetFor(body,tokens);
+          card._snippet.innerHTML=snip?highlight(snip,tokens):'';
+          card._snippet.hidden=!snip;
+        }else{
+          card._snippet.hidden=true;
+          card._snippet.textContent='';
+        }
+      }else{
+        link.textContent=card._title;
+        blurb.textContent=card._excerpt;
+        card._snippet.hidden=true;
+        card._snippet.textContent='';
+      }
       if(ok)shown++;
     });
     if(!used)return;
@@ -1558,6 +1658,7 @@ footer a:hover{color:var(--bone)}
   cat.addEventListener('focusout',function(){requestAnimationFrame(function(){if(!cat.contains(document.activeElement))setOpen(false)})});
   document.addEventListener('click',function(e){if(!cat.contains(e.target))setOpen(false)});
   syncAll();
+  fetch('library/search-index.json').then(function(r){return r.json()}).then(function(data){bodyIndex=data||{};if(used)apply()}).catch(function(){});
 })();
 </script>
 
