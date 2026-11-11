@@ -95,6 +95,12 @@ insert into auth.sessions (id, user_id) values
   ('cccccccc-cccc-4ccc-8ccc-cccccccccc03', '11111111-1111-4111-8111-111111111003')
 on conflict (id) do nothing;
 
+insert into private.sign_in_code_passes (session_id, user_id) values
+  ('cccccccc-cccc-4ccc-8ccc-cccccccccc01', '22222222-2222-4222-8222-222222222001'),
+  ('cccccccc-cccc-4ccc-8ccc-cccccccccc02', '22222222-2222-4222-8222-222222222002'),
+  ('cccccccc-cccc-4ccc-8ccc-cccccccccc03', '11111111-1111-4111-8111-111111111003')
+on conflict (session_id) do nothing;
+
 set role authenticated;
 do $$
 begin

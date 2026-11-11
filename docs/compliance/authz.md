@@ -4,7 +4,7 @@
 
 Clients use `/portal/`. Staff use `/staff/`. Both use Supabase Auth email and password. The publishable key in `assets/bloom-config.js` is the browser key. The service-role key is read only inside Edge Functions from the platform environment.
 
-Staff must reach authenticator assurance level `aal2` before `staff_bootstrap` returns data. A staff member with no factor is shown a TOTP enrolment screen. A staff member who already has a factor is shown the six-digit challenge.
+After a correct password, both portals require a six-digit code emailed to the account address. The code expires in 10 minutes, works once, is stored only as a hash, and locks after five wrong attempts. `private.assurance_ok()` and `private.profile_active()` are false until `private.sign_in_code_passes` has a row for that session, so data functions and row checks refuse the session even if the browser skips the screen. The access-token hook copies `email_code_ok` into the token on the next refresh. The password session still exists before the code. That is a limit of Supabase Auth: the code gate is in the database, not by withholding the first token. Staff then still need authenticator assurance level `aal2`. The order on screen is password, then the email code, then the authenticator. Clients who have enrolled an authenticator follow the same email code and then the authenticator. Clients who have not enrolled an authenticator stop after the email code.
 
 Clients may enrol TOTP from Profile. If they have a verified factor, row checks require `aal2` as well. If they have not enrolled, `aal1` is enough for their own portal.
 

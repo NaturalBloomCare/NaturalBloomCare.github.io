@@ -190,6 +190,28 @@
       (state.err ? '<div class="err" role="alert">' + esc(state.err) + '</div>' : '') +
       '<form id="login"><div class="field"><label for="email">Email</label><input class="input" id="email" type="email" autocomplete="username" required value="' + esc(state.email) + '"></div><div class="field"><label for="pass">Password</label><input class="input" id="pass" type="password" autocomplete="current-password" required></div><button class="cta cta-solid" type="submit" style="margin-top:18px">Sign in</button></form><p class="small" style="margin-top:16px"><a class="tap-target" href="/auth/reset.html">Forgot password?</a></p><p class="small">Staff use a separate sign-in that is not linked from the public site.</p></div></div></div>';
   }
+  function emailCodeScreen() {
+    return '<div class="auth-screen"><div class="auth-art"><div class="cap"><div class="t">Check your email</div><div class="s">One-time code</div></div></div><div><div class="neo auth-card">' + homeLogo() + '<div class="eyebrow" style="margin-top:22px">Client portal</div><h1>Enter your <em>code.</em></h1><p class="small">We sent a six-digit code to your account email. It works once and expires in about 10 minutes.</p>' +
+      (state.err ? '<div class="err" role="alert">' + esc(state.err) + '</div>' : '') +
+      '<form id="email-code"><div class="field"><label for="email-code-input">Six-digit code</label><input class="input" id="email-code-input" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required></div><button class="cta cta-solid tap-target" type="submit" style="margin-top:16px">Continue</button></form>' +
+      '<p class="small" style="margin-top:16px"><button class="link tap-target" type="button" id="resend-code">Resend code</button></p></div></div></div>';
+  }
+  function requestSignInCode() {
+    sb.auth.getSession().then(function (s) {
+      var token = s.data.session && s.data.session.access_token;
+      if (!token) return;
+      return fetch(cfg.url + '/functions/v1/send-sign-in-code', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', apikey: cfg.publishableKey, Authorization: 'Bearer ' + token },
+        body: '{}'
+      }).then(function (r) { return r.json(); }).then(function (j) {
+        if (j.status === 'not_configured' || j.status === 'failed') {
+          state.err = j.message;
+          $(emailCodeScreen());
+        }
+      });
+    });
+  }
   function mfaScreen(enroll) {
     return '<div class="auth-screen"><div class="auth-art"><div class="cap"><div class="t">A second step</div><div class="s">Optional for clients</div></div></div><div><div class="neo auth-card">' + homeLogo() + '<h1 style="margin-top:22px">' + (enroll ? 'Set up an <em>authenticator.</em>' : 'Enter your <em>code.</em>') + '</h1>' +
       (enroll && state.qr ? '<img alt="Authenticator QR code" src="' + esc(state.qr) + '" style="width:180px;height:180px;margin-top:16px">' : '') +
@@ -207,6 +229,13 @@
       await sb.auth.signOut();
       state.err = 'That account is a staff account. Use the staff sign-in.';
       $(loginScreen());
+      return;
+    }
+    var codeStatus = await sb.rpc('sign_in_code_status');
+    if (!codeStatus.data || !codeStatus.data.ok) {
+      state.step = 'email-code';
+      $(emailCodeScreen());
+      if (!state.codeAsked) { state.codeAsked = true; requestSignInCode(); }
       return;
     }
     var aal = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
@@ -257,6 +286,17 @@
   }
 
   document.addEventListener('submit', function (e) {
+    if (e.target.id === 'email-code') {
+      e.preventDefault();
+      var emailCode = document.getElementById('email-code-input').value.replace(/\D/g, '').slice(0, 6);
+      sb.rpc('verify_sign_in_code', { p_code: emailCode }).then(function (r) {
+        var data = r.data || {};
+        if (r.error || !data.ok) { state.err = (data && data.message) || 'That code was not accepted.'; $(emailCodeScreen()); return; }
+        state.err = '';
+        state.codeAsked = false;
+        sb.auth.refreshSession().then(function () { boot(); });
+      });
+    }
     if (e.target.id === 'login') {
       e.preventDefault();
       state.email = document.getElementById('email').value.trim();
@@ -320,6 +360,13 @@
     if (e.target.closest('[data-close]')) {
       var reader = document.querySelector('[data-reader]');
       if (reader) reader.hidden = true;
+    }
+    if (e.target.id === 'resend-code') {
+      if (state.resendAt && Date.now() < state.resendAt) { state.err = 'Please wait a minute and try again.'; $(emailCodeScreen()); return; }
+      state.resendAt = Date.now() + 60000;
+      state.err = '';
+      requestSignInCode();
+      $(emailCodeScreen());
     }
     if (e.target.closest('[data-out]')) signOut('');
     if (e.target.closest('[data-jane]')) alert('The Jane portal address is still a placeholder. Your results and clinical care plan are not stored here.');

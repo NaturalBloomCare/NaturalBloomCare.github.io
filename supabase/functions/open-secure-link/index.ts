@@ -7,7 +7,7 @@ Deno.serve(async (req) => {
   const token = String(body.token || '')
   const action = String(body.action || '')
   const code = String(body.code || '').replace(/\D/g, '')
-  if (!token || !['request-code', 'confirm', 'open'].includes(action)) {
+  if (!token || !['request-code', 'confirm'].includes(action)) {
     return json({ status: 'error', message: 'This link is not valid.' }, 400)
   }
   const admin = adminClient()
@@ -22,24 +22,6 @@ Deno.serve(async (req) => {
   if (found.data.locked_until && new Date(found.data.locked_until).getTime() > Date.now()) {
     logStatus('secure-link', 'locked', found.data.document_id)
     return json({ status: 'locked', message: 'Too many incorrect codes. This link is locked for 15 minutes.' }, 429)
-  }
-
-  if (action === 'open') {
-    const gate = await admin.rpc('redeem_requisition_link', { p_token_hash: tokenHash })
-    const gateStatus = String(gate.data?.status || '')
-    if (gate.error || !gate.data?.ok) {
-      logStatus('secure-link', gateStatus || 'invalid', found.data.document_id)
-      const message = gateStatus === 'revoked'
-        ? 'This link was turned off. Ask the clinic to send a new one.'
-        : gateStatus === 'expired'
-          ? 'This link has expired. Ask the clinic to send a new one.'
-          : 'This link is not valid.'
-      return json({ status: gateStatus || 'invalid', message }, gateStatus === 'expired' ? 410 : 404)
-    }
-    const signed = await admin.storage.from('patient-documents').createSignedUrl(String(gate.data.storage_path), Number(gate.data.ttl_seconds || 900))
-    if (signed.error || !signed.data?.signedUrl) return json({ status: 'error', message: 'A short-lived link could not be created.' }, 500)
-    logStatus('secure-link', 'opened', found.data.document_id)
-    return json({ status: 'ok', url: signed.data.signedUrl, expiresIn: Number(gate.data.ttl_seconds || 900) })
   }
 
   if (action === 'request-code') {
@@ -73,25 +55,19 @@ Deno.serve(async (req) => {
     return json({ status: 'code_sent', message: 'A six-digit code was sent to the same address. It is not a second channel, so a person who can read that mailbox can also read the code.' })
   }
 
-  const attempts = Number(found.data.failed_attempts || 0)
-  if (!code || !found.data.code_hash || await sha256(code) !== found.data.code_hash) {
-    const nextAttempts = attempts + 1
-    const locked = nextAttempts >= 5
-    await admin.from('secure_links').update({
-      failed_attempts: nextAttempts,
-      locked_until: locked ? new Date(Date.now() + 15 * 60 * 1000).toISOString() : null
-    }).eq('id', found.data.id)
-    logStatus('secure-link', locked ? 'locked' : 'rejected', found.data.document_id)
-    if (locked) return json({ status: 'locked', message: 'Too many incorrect codes. This link is locked for 15 minutes.' }, 429)
-    return json({ status: 'error', message: 'That code does not match. Request a new one if it has expired.' }, 401)
+  const codeHash = await sha256(code)
+  const gate = await admin.rpc('confirm_requisition_code', { p_token_hash: tokenHash, p_code_hash: codeHash })
+  const gateStatus = String(gate.data?.status || '')
+  if (gate.error || !gate.data?.ok) {
+    logStatus('secure-link', gateStatus || 'rejected', found.data.document_id)
+    if (gateStatus === 'locked') return json({ status: 'locked', message: 'Too many attempts. Try again later.' }, 429)
+    if (gateStatus === 'invalid') return json({ status: 'invalid', message: 'This link is not valid.' }, 404)
+    return json({ status: 'rejected', message: 'That code was not accepted.' }, 401)
   }
-  const doc = await admin.from('generated_documents').select('storage_path').eq('id', found.data.document_id).maybeSingle()
-  if (!doc.data) return json({ status: 'error', message: 'The document is no longer available.' }, 404)
-  const signed = await admin.storage.from('patient-documents').createSignedUrl(doc.data.storage_path, 120)
-  if (signed.error || !signed.data?.signedUrl) return json({ status: 'error', message: 'A short-lived link could not be created.' }, 500)
-  await admin.from('secure_links').update({ confirmed_at: new Date().toISOString(), code_hash: null, failed_attempts: 0, locked_until: null }).eq('id', found.data.id)
+  const signed = await admin.storage.from('patient-documents').createSignedUrl(String(gate.data.storage_path), Number(gate.data.ttl_seconds || 900))
+  if (signed.error || !signed.data?.signedUrl) return json({ status: 'error', message: 'The document could not be opened.' }, 500)
   logStatus('secure-link', 'opened', found.data.document_id)
-  return json({ status: 'ok', url: signed.data.signedUrl, expiresIn: 120 })
+  return json({ status: 'ok', url: signed.data.signedUrl, expiresIn: Number(gate.data.ttl_seconds || 900) })
 })
 
 function randomCode(): string {
@@ -106,12 +82,22 @@ async function sha256(value: string): Promise<string> {
 }
 
 async function sendCode(provider: string, apiKey: string, from: string, to: string, code: string) {
-  const text = `Your Natural Bloom Care Inc. confirmation code is ${code}. It opens one document for two minutes.`
-  if (provider.toLowerCase() === 'resend') {
+  const text = `Your Natural Bloom Care Inc. code is ${code}. It works once and expires in 10 minutes.`
+  const subject = 'Your confirmation code'
+  const name = provider.toLowerCase()
+  if (name === 'resend') {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
-      body: JSON.stringify({ from, to: [to], subject: 'Your confirmation code', text })
+      body: JSON.stringify({ from, to: [to], subject, text })
+    })
+    return res.ok
+  }
+  if (name === 'postmark') {
+    const res = await fetch('https://api.postmarkapp.com/email', {
+      method: 'POST',
+      headers: { 'X-Postmark-Server-Token': apiKey, 'content-type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ From: from, To: to, Subject: subject, TextBody: text, MessageStream: 'outbound' })
     })
     return res.ok
   }
@@ -120,7 +106,7 @@ async function sendCode(provider: string, apiKey: string, from: string, to: stri
   const res = await fetch(url, {
     method: 'POST',
     headers: { Authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
-    body: JSON.stringify({ from, to, subject: 'Your confirmation code', text })
+    body: JSON.stringify({ from, to, subject, text })
   })
   return res.ok
 }

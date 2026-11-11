@@ -8,6 +8,8 @@
   window.sb = sb;
   var factorId = '';
   var timer = null;
+  var pendingUserId = '';
+  var signedEmail = '';
 
   function api() { return window.BloomAPI; }
   function authPatch(patch) {
@@ -39,6 +41,51 @@
       api().render();
       return;
     }
+    pendingUserId = res.data.user.id;
+    signedEmail = email;
+    var passed = await emailGate(email);
+    if (!passed) return;
+    await totp(email);
+  }
+
+  async function emailGate(email) {
+    var status = await sb.rpc('sign_in_code_status');
+    if (status.data && status.data.ok) return true;
+    authPatch({ step: 'email-code', email: email, err: '' });
+    if (api()) api().render();
+    await sendSignInCode();
+    return false;
+  }
+
+  async function sendSignInCode() {
+    var session = await sb.auth.getSession();
+    var token = session.data.session && session.data.session.access_token;
+    if (!token) { authPatch({ err: 'Sign in again.' }); if (api()) api().render(); return; }
+    var res = await fetch(cfg.url + '/functions/v1/send-sign-in-code', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', apikey: cfg.publishableKey, Authorization: 'Bearer ' + token },
+      body: '{}'
+    });
+    var body = await res.json().catch(function () { return {}; });
+    if (body.status === 'not_configured' || body.status === 'failed' || body.status === 'locked' || body.status === 'throttled') {
+      authPatch({ err: body.message || 'A code could not be sent.' });
+      if (api()) api().render();
+    }
+  }
+
+  async function emailCode(value) {
+    var res = await sb.rpc('verify_sign_in_code', { p_code: value });
+    var data = res.data || {};
+    if (res.error || !data.ok) {
+      authPatch({ err: data.message || 'That code was not accepted.' });
+      if (api()) api().render();
+      return;
+    }
+    await sb.auth.refreshSession();
+    await totp(signedEmail);
+  }
+
+  async function totp(email) {
     var aal = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
     var factors = await sb.auth.mfa.listFactors();
     var verified = factors.data && factors.data.totp && factors.data.totp[0];
@@ -48,14 +95,14 @@
     }
     if (verified) {
       factorId = verified.id;
-      authPatch({ step: 'mfa', email: email, err: '', pending: res.data.user.id });
+      authPatch({ step: 'mfa', email: email, err: '', pending: pendingUserId });
       api().render();
       return;
     }
     var enrolled = await sb.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Bloom staff' });
     if (enrolled.error) { fail(enrolled.error.message); return; }
     factorId = enrolled.data.id;
-    authPatch({ step: 'enroll', email: email, err: '', qr: enrolled.data.totp.qr_code, pending: res.data.user.id });
+    authPatch({ step: 'enroll', email: email, err: '', qr: enrolled.data.totp.qr_code, pending: pendingUserId });
     api().render();
   }
 
@@ -98,7 +145,7 @@
     await resume();
   }
 
-  window.BloomAuth = { password: password, code: code, boot: boot, resume: resume };
+  window.BloomAuth = { password: password, code: code, emailCode: emailCode, resendEmailCode: sendSignInCode, boot: boot, resume: resume };
 
   window.BloomSync = {
     schedule: function () {
