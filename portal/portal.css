@@ -45,6 +45,15 @@ a{color:var(--burgundy)}
 header{position:sticky;top:0;z-index:50;background:rgba(245,240,232,0.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 28px;padding:22px 48px;max-width:1280px;margin:0 auto}
 .brand{font-family:var(--serif);font-size:1.7rem;letter-spacing:0.42em;text-indent:0.42em;font-weight:400;color:var(--ink);text-decoration:none}
+.brand.logo-link{display:inline-flex;align-items:center;letter-spacing:0;text-indent:0;font-size:0;line-height:0}
+.brand.logo-link img,.mono.logo-link img{height:46px;width:auto;display:block}
+footer .mono.logo-link{text-indent:0;letter-spacing:0;font-size:0;line-height:0}
+footer .mono.logo-link img{height:42px;margin:0 auto}
+@media (max-width:720px){
+  .bar{padding:14px 20px}
+  .brand.logo-link img{height:30px}
+  .auth-card{margin:28px auto;padding:28px 20px}
+}
 nav{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 nav a{font-size:0.7rem;letter-spacing:0.22em;text-transform:uppercase;font-weight:400;color:var(--ink);text-decoration:none;padding:12px 18px;border-radius:40px;transition:all 0.4s}
 nav a:hover{color:var(--burgundy)}

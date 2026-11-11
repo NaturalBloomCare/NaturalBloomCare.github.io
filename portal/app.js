@@ -63,14 +63,14 @@
     var env = state.home.environment === 'testing'
       ? '<div class="banner"><p class="small">Testing environment. The people and numbers in this portal are fictional. Clinical results and treatment plans stay in Jane.</p></div>'
       : '';
-    return env + '<header><div class="bar"><a class="brand" href="#/dashboard">BLOOM</a><nav aria-label="Portal sections">' +
+    return env + '<header><div class="bar"><a class="brand logo-link" href="#/dashboard"><img src="/assets/logo/bloom-logo-animated-hover-dark.svg" alt="Bloom Integrative Health"></a><nav aria-label="Portal sections">' +
       '<a href="#/dashboard" data-nav="dashboard">Insights</a>' +
       '<a href="#/results" data-nav="results">Results</a>' +
       '<a href="#/notes" data-nav="notes">Care plans</a>' +
       '<a href="#/library" data-nav="library">Library</a>' +
       '</nav><a class="me" href="#/profile" data-nav="profile" title="Your profile" aria-label="Your profile">' + esc(initials(p)) + '</a></div><div class="divider-band"></div></header><main class="wrap">' + body + '</main>' +
       team() +
-      '<div class="divider-band"></div><footer><div class="mono">BLOOM</div><div class="tag">Rituals That Bring You Home</div><div class="fine">' + esc(state.home.clinic) + ' · Calgary, Alberta · Health information is handled under Alberta privacy law</div></footer>' +
+      '<div class="divider-band"></div><footer><div class="mono logo-link"><img src="/assets/logo/bloom-logo-animated-hover-dark.svg" alt="Bloom Integrative Health"></div><div class="tag">Rituals That Bring You Home</div><div class="fine">' + esc(state.home.clinic) + ' · Calgary, Alberta · Health information is handled under Alberta privacy law</div></footer>' +
       '<a class="daisy-fab" href="#/daisy" data-nav="daisy" aria-label="Chat with Daisy"><span>Daisy</span></a>' +
       '<div class="reader" data-reader hidden role="dialog" aria-modal="true" aria-labelledby="reader-title"><div class="reader-bar"><button class="reader-close" type="button" data-close>Close</button></div><div class="reader-hero" data-r-img></div><div class="reader-body"><div class="sub" data-r-topic></div><h1 id="reader-title" data-r-title></h1><p class="lede" data-r-desc></p><div data-r-body></div></div></div>';
   }
@@ -172,12 +172,12 @@
   }
 
   function loginScreen() {
-    return '<div class="auth-screen"><div class="auth-art" role="img" aria-label="Lilac petals"><div class="cap"><div class="t">Where health takes root</div><div class="s">Bloom · Client portal</div></div></div><div><div class="neo auth-card"><a class="brand" href="/">BLOOM</a><div class="eyebrow" style="margin-top:22px">Client portal</div><h1>Welcome <em>back.</em></h1><p class="small">Sign in to your secure client portal. This environment is for testing until the clinic says otherwise.</p>' +
+    return '<div class="auth-screen"><div class="auth-art" role="img" aria-label="Lilac petals"><div class="cap"><div class="t">Where health takes root</div><div class="s">Bloom · Client portal</div></div></div><div><div class="neo auth-card"><a class="brand logo-link" href="/"><img src="/assets/logo/bloom-logo-animated-hover-dark.svg" alt="Bloom Integrative Health"></a><div class="eyebrow" style="margin-top:22px">Client portal</div><h1>Welcome <em>back.</em></h1><p class="small">Sign in to your secure client portal. This environment is for testing until the clinic says otherwise.</p>' +
       (state.err ? '<div class="err" role="alert">' + esc(state.err) + '</div>' : '') +
       '<form id="login"><div class="field"><label for="email">Email</label><input class="input" id="email" type="email" autocomplete="username" required value="' + esc(state.email) + '"></div><div class="field"><label for="pass">Password</label><input class="input" id="pass" type="password" autocomplete="current-password" required></div><button class="cta cta-solid" type="submit" style="margin-top:18px">Sign in</button></form><p class="small" style="margin-top:16px"><a href="/auth/reset.html">Forgot password?</a></p><p class="small">Staff use a separate sign-in that is not linked from the public site.</p></div></div></div>';
   }
   function mfaScreen(enroll) {
-    return '<div class="auth-screen"><div class="auth-art"><div class="cap"><div class="t">A second step</div><div class="s">Optional for clients</div></div></div><div><div class="neo auth-card"><h1>' + (enroll ? 'Set up an <em>authenticator.</em>' : 'Enter your <em>code.</em>') + '</h1>' +
+    return '<div class="auth-screen"><div class="auth-art"><div class="cap"><div class="t">A second step</div><div class="s">Optional for clients</div></div></div><div><div class="neo auth-card"><a class="brand logo-link" href="/"><img src="/assets/logo/bloom-logo-animated-hover-dark.svg" alt="Bloom Integrative Health"></a><h1 style="margin-top:22px">' + (enroll ? 'Set up an <em>authenticator.</em>' : 'Enter your <em>code.</em>') + '</h1>' +
       (enroll && state.qr ? '<img alt="Authenticator QR code" src="' + esc(state.qr) + '" style="width:180px;height:180px;margin-top:16px">' : '') +
       (state.err ? '<div class="err">' + esc(state.err) + '</div>' : '') +
       '<form id="mfa"><div class="field"><label for="code">Six-digit code</label><input class="input" id="code" inputmode="numeric" autocomplete="one-time-code" required></div><button class="cta cta-solid" type="submit" style="margin-top:16px">Continue</button></form>' +

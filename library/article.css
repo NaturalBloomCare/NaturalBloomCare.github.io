@@ -120,7 +120,8 @@ h2 em,h1 em{font-style:italic;color:var(--burgundy)}
 footer{background:var(--ink);color:rgba(245,240,232,.7);padding:90px 0 40px;font-size:.88rem}
 .f2{padding:80px 0 36px}
 .f2-top{display:flex;justify-content:space-between;align-items:center;gap:40px;flex-wrap:wrap;padding-bottom:46px;border-bottom:1px solid rgba(216,196,154,.2)}
-.f2 .logo{color:var(--bone);display:block;margin-bottom:14px}
+.f2 .logo{color:var(--bone);display:block;margin-bottom:14px;letter-spacing:0}
+.f2 .logo img{height:42px;width:auto;display:block}
 .f2 .tl{font-family:var(--serif);font-style:italic;font-size:1.3rem;color:var(--bone)}
 .f2-social{display:flex;gap:12px;margin-top:20px}
 .f2-social a{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--gold);border:1px solid rgba(216,196,154,.3);transition:all .4s}
