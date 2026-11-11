@@ -11,7 +11,13 @@
       body: JSON.stringify(body)
     }).then(function(r){ return r.json(); });
   }
-  document.getElementById('ask').addEventListener('click', function(){
+  say('Opening the document…');
+  call({ token: token, action: 'open' }).then(function(j){
+    if(j.url){ say('Opening the document. This address works only for a short time. The clinic can turn the link off.'); location.href = j.url; }
+    else say(j.message || 'This link is not valid.');
+  }).catch(function(){ say('The document could not be opened.'); });
+  var ask = document.getElementById('ask');
+  if(ask) ask.addEventListener('click', function(){
     say('Sending a code…');
     call({ token: token, action: 'request-code' }).then(function(j){
       say(j.message || j.status || 'Done.');

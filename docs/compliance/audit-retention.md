@@ -22,6 +22,8 @@ Failed passwords and the five-failure lock are not written today. `hook_password
 
 Once migration 14 is applied and the custom access token hook is on, a refused sign-in writes `Sign-in blocked` with the detail `Not on access list`. The email address is not copied into that detail. Sheet sync writes `Updated access list` for each change, again without the email address.
 
+A requisition send writes `Sent requisition link` with the recipient address, because the clinic asked for the recipient on that row. Opening the link writes `Opened requisition link` with the same recipient. Revoking it writes `Revoked requisition link`. Staff cannot edit those rows. Opening a client record, a requisition, or a document also writes `Viewed …` through `note_staff_view`. The owner’s audit screen reads the latest 400 server rows. There is no point-in-time recovery on the Pro plan; that is a separate platform gap.
+
 Tracking deletion nulls the value and the note, then writes “Deleted tracking entry” with the row id.
 
 ## What is not written

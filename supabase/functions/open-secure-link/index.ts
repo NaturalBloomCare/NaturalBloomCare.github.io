@@ -7,7 +7,7 @@ Deno.serve(async (req) => {
   const token = String(body.token || '')
   const action = String(body.action || '')
   const code = String(body.code || '').replace(/\D/g, '')
-  if (!token || !['request-code', 'confirm'].includes(action)) {
+  if (!token || !['request-code', 'confirm', 'open'].includes(action)) {
     return json({ status: 'error', message: 'This link is not valid.' }, 400)
   }
   const admin = adminClient()
@@ -22,6 +22,24 @@ Deno.serve(async (req) => {
   if (found.data.locked_until && new Date(found.data.locked_until).getTime() > Date.now()) {
     logStatus('secure-link', 'locked', found.data.document_id)
     return json({ status: 'locked', message: 'Too many incorrect codes. This link is locked for 15 minutes.' }, 429)
+  }
+
+  if (action === 'open') {
+    const gate = await admin.rpc('redeem_requisition_link', { p_token_hash: tokenHash })
+    const gateStatus = String(gate.data?.status || '')
+    if (gate.error || !gate.data?.ok) {
+      logStatus('secure-link', gateStatus || 'invalid', found.data.document_id)
+      const message = gateStatus === 'revoked'
+        ? 'This link was turned off. Ask the clinic to send a new one.'
+        : gateStatus === 'expired'
+          ? 'This link has expired. Ask the clinic to send a new one.'
+          : 'This link is not valid.'
+      return json({ status: gateStatus || 'invalid', message }, gateStatus === 'expired' ? 410 : 404)
+    }
+    const signed = await admin.storage.from('patient-documents').createSignedUrl(String(gate.data.storage_path), Number(gate.data.ttl_seconds || 900))
+    if (signed.error || !signed.data?.signedUrl) return json({ status: 'error', message: 'A short-lived link could not be created.' }, 500)
+    logStatus('secure-link', 'opened', found.data.document_id)
+    return json({ status: 'ok', url: signed.data.signedUrl, expiresIn: Number(gate.data.ttl_seconds || 900) })
   }
 
   if (action === 'request-code') {

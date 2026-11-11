@@ -142,7 +142,7 @@
         return '<option value="' + A.esc(p.id) + '">' + A.esc(p.first + ' ' + p.last) + ' · ' + A.esc(p.id) + '</option>';
       }).join('');
       A.openDialog('<div class="x-row"><div><div class="sub">' + A.esc(num || 'Form') + '</div><h2>' + A.esc(name) + '</h2></div><button class="icon-btn" data-action="close" aria-label="Close">' + A.icon('close') + '</button></div>' +
-        '<p class="small" style="margin-top:8px">Filled from the minimum record: name, date of birth, city, a masked health number, and the practitioner profile. Anything you type is stored only inside the PDF, not as a diagnosis or a lab result.</p>' +
+        '<p class="small" style="margin-top:8px">Filled from the minimum record: name, date of birth, city, the last four digits of the health number, and the practitioner profile. Do not type a diagnosis, a history, or a full health number. Those stay in Jane. Anything you type is stored only inside the PDF.</p>' +
         '<form class="form" id="fill-form" style="margin-top:16px"><div class="field"><label for="ff-p">Patient</label><select class="select" id="ff-p" required>' + patients + '</select></div>' +
         '<div class="field"><label for="ff-tests">What you are requesting</label><textarea class="input" id="ff-tests" placeholder="Tests or imaging you want on this requisition"></textarea></div>' +
         '<div class="field"><label for="ff-note">Note for the receiving site</label><textarea class="input" id="ff-note" placeholder="Only what this requisition needs. Leave the history in Jane."></textarea></div>' +
@@ -199,7 +199,8 @@
     A.closeLayer();
     A.openDialog('<div class="sub">Stored privately</div><h2>Requisition <em>record</em></h2><p class="small" style="margin-top:10px">The PDF is in a private bucket. A download link expires in about two minutes. Sending is logged. Email does not attach the file.</p>' +
       '<div class="acts"><button class="cta cta-ghost" type="button" data-send="portal" data-doc="' + reg.data + '">Patient portal</button><button class="cta cta-ghost" type="button" data-send="email" data-doc="' + reg.data + '">Email a link</button><button class="cta cta-ghost" type="button" data-send="fax" data-doc="' + reg.data + '">Fax</button><button class="cta cta-solid" type="button" data-dl="' + reg.data + '">Download</button></div>' +
-      '<div class="field" id="send-to" hidden><label for="ff-to">Recipient</label><input class="input" id="ff-to" placeholder="Email address or fax number"></div>');
+      '<div class="field" id="send-to" hidden><label for="ff-to">Recipient</label><input class="input" id="ff-to" placeholder="Email address"></div>' +
+      '<button class="cta cta-ghost" type="button" id="revoke-link" hidden style="margin-top:12px">Revoke the last link</button>');
   }
 
   document.addEventListener('click', function (e) {
@@ -221,7 +222,19 @@
         to: channel === 'portal' ? 'Client portal' : document.getElementById('ff-to').value.trim(),
         purpose: 'Requisition delivery',
         what: 'Requisition record'
-      }).then(function (j) { api().toast(j.message || j.status); });
+      }).then(function (j) {
+        api().toast(j.message || j.status);
+        if (j.linkId) {
+          var revoke = document.getElementById('revoke-link');
+          if (revoke) { revoke.hidden = false; revoke.setAttribute('data-id', j.linkId); }
+        }
+      });
+    }
+    var revoke = e.target.closest('#revoke-link');
+    if (revoke && revoke.getAttribute('data-id')) {
+      sb.rpc('revoke_requisition_link', { p_id: revoke.getAttribute('data-id') }).then(function (r) {
+        api().toast(r.error ? r.error.message : 'The link was turned off.');
+      });
     }
   });
 
