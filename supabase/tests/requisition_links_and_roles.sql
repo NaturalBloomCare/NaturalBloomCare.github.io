@@ -3,6 +3,8 @@
 
 begin;
 
+select set_config('bloom.code_pepper', 'rehearsal-pepper-not-a-secret', true);
+
 insert into private.portal_access (email, full_name, portal, staff_role, status, date_added)
 select lower(u.email), p.first_name || ' ' || p.last_name,
   case when p.portal_role = 'client' then 'client' else 'staff' end,
@@ -81,16 +83,13 @@ begin
   ) then
     raise exception 'the send was not audited with the recipient';
   end if;
-  perform public.request_secure_link_code(
-    'token-hash-one',
-    encode(extensions.digest('123456', 'sha256'), 'hex')
-  );
-  opened := public.confirm_requisition_code(
-    'token-hash-one',
-    encode(extensions.digest('123456', 'sha256'), 'hex')
-  );
-  if opened ->> 'status' is distinct from 'ok' or (opened ->> 'ttl_seconds')::int > 900 then
-    raise exception 'code did not open a short storage url: %', opened;
+  perform public.request_secure_link_code('token-hash-one', '123456');
+  opened := public.confirm_requisition_code('token-hash-one', '123456');
+  if opened ->> 'status' is distinct from 'ok' or (opened ->> 'ttl_seconds')::int > 120 then
+    raise exception 'code did not open a two-minute storage url: %', opened;
+  end if;
+  if (select confirmed_at from public.secure_links where token_hash = 'token-hash-one') is null then
+    raise exception 'confirmed_at was not set';
   end if;
   if not exists (
     select 1 from audit.events
@@ -98,10 +97,7 @@ begin
   ) then
     raise exception 'the open was not audited';
   end if;
-  opened := public.confirm_requisition_code(
-    'token-hash-one',
-    encode(extensions.digest('123456', 'sha256'), 'hex')
-  );
+  opened := public.confirm_requisition_code('token-hash-one', '123456');
   if opened ->> 'status' is distinct from 'rejected' then
     raise exception 'a used code was accepted again';
   end if;
@@ -122,7 +118,7 @@ do $$
 declare
   opened jsonb;
 begin
-  opened := public.confirm_requisition_code('token-hash-one', encode(extensions.digest('000000', 'sha256'), 'hex'));
+  opened := public.confirm_requisition_code('token-hash-one', '000000');
   if opened ->> 'status' is distinct from 'invalid' then
     raise exception 'revoked link still opened';
   end if;

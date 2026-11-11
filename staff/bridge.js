@@ -99,6 +99,12 @@
       api().render();
       return;
     }
+    var all = (factors.data && factors.data.all) || [];
+    for (var i = 0; i < all.length; i++) {
+      if (all[i].factor_type === 'totp' && all[i].status !== 'verified') {
+        await sb.auth.mfa.unenroll({ factorId: all[i].id });
+      }
+    }
     var enrolled = await sb.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Bloom staff' });
     if (enrolled.error) { fail(enrolled.error.message); return; }
     factorId = enrolled.data.id;
@@ -115,6 +121,7 @@
   }
 
   async function resume() {
+    await sb.rpc('finish_invited_staff');
     var touch = await sb.rpc('touch_session');
     if (touch.error) { fail(touch.error.message); return; }
     var snap = await sb.rpc('staff_bootstrap');
@@ -134,12 +141,36 @@
   async function boot() {
     var session = (await sb.auth.getSession()).data.session;
     if (!session) { api().render(); return; }
+    var role = session.user.app_metadata && session.user.app_metadata.portal_role;
+    signedEmail = session.user.email || '';
+    pendingUserId = session.user.id;
+    var status = await sb.rpc('sign_in_code_status');
     var aal = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
-    if (aal.data && aal.data.nextLevel === 'aal2' && aal.data.currentLevel !== 'aal2') {
-      var factors = await sb.auth.mfa.listFactors();
-      factorId = factors.data.totp[0] && factors.data.totp[0].id;
-      authPatch({ step: 'mfa', email: session.user.email, err: '', pending: session.user.id });
+    var factors = await sb.auth.mfa.listFactors();
+    var verified = factors.data && factors.data.totp && factors.data.totp[0];
+    var step = window.nextAuthStep({
+      signedIn: true,
+      portal: 'staff',
+      role: role,
+      codeOk: !!(status.data && status.data.ok),
+      currentLevel: aal.data && aal.data.currentLevel,
+      nextLevel: aal.data && aal.data.nextLevel,
+      hasVerifiedFactor: !!verified
+    });
+    if (step === 'wrong-portal') {
+      await sb.auth.signOut();
+      authPatch({ step: 'login', err: 'This sign-in is for Bloom staff. Clients use the portal linked from the public site.' });
       api().render();
+      return;
+    }
+    if (step === 'email-code') {
+      authPatch({ step: 'email-code', email: signedEmail, err: '' });
+      api().render();
+      await sendSignInCode();
+      return;
+    }
+    if (step === 'mfa' || step === 'enroll') {
+      await totp(signedEmail);
       return;
     }
     await resume();

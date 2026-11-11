@@ -205,8 +205,8 @@
         headers: { 'content-type': 'application/json', apikey: cfg.publishableKey, Authorization: 'Bearer ' + token },
         body: '{}'
       }).then(function (r) { return r.json(); }).then(function (j) {
-        if (j.status === 'not_configured' || j.status === 'failed') {
-          state.err = j.message;
+        if (j.status === 'not_configured' || j.status === 'failed' || j.status === 'locked' || j.status === 'throttled') {
+          state.err = j.message || 'A code could not be sent.';
           $(emailCodeScreen());
         }
       });
@@ -225,21 +225,29 @@
     var session = (await sb.auth.getSession()).data.session;
     if (!session) { state.step = 'login'; $(loginScreen()); return; }
     var role = session.user.app_metadata && session.user.app_metadata.portal_role;
-    if (role && role !== 'client') {
+    var codeStatus = await sb.rpc('sign_in_code_status');
+    var aal = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+    var step = window.nextAuthStep({
+      signedIn: true,
+      portal: 'client',
+      role: role,
+      codeOk: !!(codeStatus.data && codeStatus.data.ok),
+      currentLevel: aal.data && aal.data.currentLevel,
+      nextLevel: aal.data && aal.data.nextLevel
+    });
+    if (step === 'wrong-portal') {
       await sb.auth.signOut();
       state.err = 'That account is a staff account. Use the staff sign-in.';
       $(loginScreen());
       return;
     }
-    var codeStatus = await sb.rpc('sign_in_code_status');
-    if (!codeStatus.data || !codeStatus.data.ok) {
+    if (step === 'email-code') {
       state.step = 'email-code';
       $(emailCodeScreen());
       if (!state.codeAsked) { state.codeAsked = true; requestSignInCode(); }
       return;
     }
-    var aal = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
-    if (aal.data && aal.data.nextLevel === 'aal2' && aal.data.currentLevel !== 'aal2') {
+    if (step === 'mfa') {
       state.step = 'mfa';
       $(mfaScreen(false));
       return;
@@ -249,7 +257,19 @@
   async function enter() {
     await sb.rpc('touch_session');
     var res = await sb.rpc('client_home');
-    if (res.error) { state.err = res.error.message; $(loginScreen()); return; }
+    if (res.error) {
+      var again = await sb.rpc('sign_in_code_status');
+      if (!again.data || !again.data.ok) {
+        state.step = 'email-code';
+        state.err = '';
+        $(emailCodeScreen());
+        if (!state.codeAsked) { state.codeAsked = true; requestSignInCode(); }
+        return;
+      }
+      state.err = res.error.message;
+      $(loginScreen());
+      return;
+    }
     state.home = res.data;
     state.last = Date.now();
     startIdle();

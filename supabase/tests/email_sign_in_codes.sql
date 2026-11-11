@@ -2,6 +2,8 @@
 
 begin;
 
+select set_config('bloom.code_pepper', 'rehearsal-pepper-not-a-secret', true);
+
 insert into private.portal_access (email, full_name, portal, staff_role, status, date_added)
 select 'amelia.hart@example.com', 'Amelia Hart', 'client', null, 'active', current_date
 where not exists (select 1 from private.portal_access where email = 'amelia.hart@example.com');
@@ -34,7 +36,7 @@ reset role;
 select public.prepare_sign_in_code(
   '22222222-2222-4222-8222-222222222001',
   'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeee1',
-  encode(extensions.digest('654321', 'sha256'), 'hex')
+  '654321'
 );
 
 set role authenticated;

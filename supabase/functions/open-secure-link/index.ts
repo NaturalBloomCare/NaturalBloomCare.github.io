@@ -33,17 +33,18 @@ Deno.serve(async (req) => {
       return json({ status: 'not_configured', message: 'A confirmation code cannot be sent until email is configured.' })
     }
     const next = randomCode()
-    const codeHash = await sha256(next)
-    const gate = await admin.rpc('request_secure_link_code', { p_token_hash: tokenHash, p_code_hash: codeHash })
+    const gate = await admin.rpc('request_secure_link_code', { p_token_hash: tokenHash, p_code: next })
     const gateStatus = String(gate.data?.status || '')
     if (gate.error || !gate.data?.ok) {
-      const status = gateStatus === 'throttled' || gateStatus === 'locked' ? gateStatus : 'invalid'
+      const status = gateStatus === 'throttled' || gateStatus === 'locked' || gateStatus === 'not_configured' ? gateStatus : 'invalid'
       logStatus('secure-link', status, found.data.document_id)
       const message = status === 'throttled'
         ? 'A code was just sent. Wait a minute before asking for another.'
         : status === 'locked'
           ? 'Too many code requests. This link is locked for 15 minutes.'
-          : 'This link is not valid.'
+          : status === 'not_configured'
+            ? 'A confirmation code cannot be sent until the code pepper is configured.'
+            : 'This link is not valid.'
       return json({ status, message }, status === 'invalid' ? 404 : 429)
     }
     const sent = await sendCode(provider, apiKey, from, String(gate.data.email || ''), next)
@@ -55,8 +56,7 @@ Deno.serve(async (req) => {
     return json({ status: 'code_sent', message: 'A six-digit code was sent to the same address. It is not a second channel, so a person who can read that mailbox can also read the code.' })
   }
 
-  const codeHash = await sha256(code)
-  const gate = await admin.rpc('confirm_requisition_code', { p_token_hash: tokenHash, p_code_hash: codeHash })
+  const gate = await admin.rpc('confirm_requisition_code', { p_token_hash: tokenHash, p_code: code })
   const gateStatus = String(gate.data?.status || '')
   if (gate.error || !gate.data?.ok) {
     logStatus('secure-link', gateStatus || 'rejected', found.data.document_id)
@@ -64,10 +64,11 @@ Deno.serve(async (req) => {
     if (gateStatus === 'invalid') return json({ status: 'invalid', message: 'This link is not valid.' }, 404)
     return json({ status: 'rejected', message: 'That code was not accepted.' }, 401)
   }
-  const signed = await admin.storage.from('patient-documents').createSignedUrl(String(gate.data.storage_path), Number(gate.data.ttl_seconds || 900))
+  const ttl = Math.min(120, Number(gate.data.ttl_seconds || 120))
+  const signed = await admin.storage.from('patient-documents').createSignedUrl(String(gate.data.storage_path), ttl)
   if (signed.error || !signed.data?.signedUrl) return json({ status: 'error', message: 'The document could not be opened.' }, 500)
   logStatus('secure-link', 'opened', found.data.document_id)
-  return json({ status: 'ok', url: signed.data.signedUrl, expiresIn: Number(gate.data.ttl_seconds || 900) })
+  return json({ status: 'ok', url: signed.data.signedUrl, expiresIn: ttl })
 })
 
 function randomCode(): string {
