@@ -6,6 +6,13 @@
   });
   var state = { step: 'login', email: '', err: '', home: null, factorId: '', qr: '', idle: null, last: Date.now() };
 
+  function signInMessage(error, fallback) {
+    var message = error && error.message ? String(error.message) : '';
+    if ((error && error.status === 403) || /not on the bloom access list/i.test(message)) {
+      return "This account isn't on the Bloom access list. Please contact the clinic.";
+    }
+    return message || fallback;
+  }
   function esc(v) {
     return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -251,7 +258,7 @@
       e.preventDefault();
       state.email = document.getElementById('email').value.trim();
       sb.auth.signInWithPassword({ email: state.email, password: document.getElementById('pass').value }).then(function (r) {
-        if (r.error) { state.err = r.error.message || 'That email and password do not match.'; $(loginScreen()); return; }
+        if (r.error) { state.err = signInMessage(r.error, 'That email and password do not match.'); $(loginScreen()); return; }
         boot();
       });
     }
