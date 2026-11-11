@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-70 -70 140 140">
+  <title>Bloom</title>
+  <g fill="none" stroke="#2E2B29" stroke-width="3.8" stroke-linejoin="miter">
+    <path transform="rotate(0)" d="M0 2.71A34.8 34.8 0 0 1 0 -57.82A34.8 34.8 0 0 1 0 2.71Z"/>
+    <path transform="rotate(60)" d="M0 2.71A34.8 34.8 0 0 1 0 -57.82A34.8 34.8 0 0 1 0 2.71Z"/>
+    <path transform="rotate(120)" d="M0 2.71A34.8 34.8 0 0 1 0 -57.82A34.8 34.8 0 0 1 0 2.71Z"/>
+    <path transform="rotate(180)" d="M0 2.71A34.8 34.8 0 0 1 0 -57.82A34.8 34.8 0 0 1 0 2.71Z"/>
+    <path transform="rotate(240)" d="M0 2.71A34.8 34.8 0 0 1 0 -57.82A34.8 34.8 0 0 1 0 2.71Z"/>
+    <path transform="rotate(300)" d="M0 2.71A34.8 34.8 0 0 1 0 -57.82A34.8 34.8 0 0 1 0 2.71Z"/>
+  </g>
+</svg>
