@@ -171,8 +171,12 @@
     return 'I can stay with general wellness: sleep, water, movement and plant-based meals. I don’t have your chart. For anything about your own health, contact your care team. In an emergency, call 911.';
   }
 
+  function homeLogo() {
+    var mark = document.getElementById('bloom-home-logo');
+    return '<a class="portal-home-logo" href="/" aria-label="Natural Bloom Care home">' + (mark ? mark.innerHTML : 'BLOOM') + '</a>';
+  }
   function loginScreen() {
-    return '<div class="auth-screen"><div class="auth-art" role="img" aria-label="Lilac petals"><div class="cap"><div class="t">Where health takes root</div><div class="s">Bloom · Client portal</div></div></div><div><div class="neo auth-card"><a class="brand" href="/">BLOOM</a><div class="eyebrow" style="margin-top:22px">Client portal</div><h1>Welcome <em>back.</em></h1><p class="small">Sign in to your secure client portal. This environment is for testing until the clinic says otherwise.</p>' +
+    return '<div class="auth-screen"><div class="auth-art" role="img" aria-label="Lilac petals"><div class="cap"><div class="t">Where health takes root</div><div class="s">Bloom · Client portal</div></div></div><div><div class="neo auth-card">' + homeLogo() + '<div class="eyebrow" style="margin-top:22px">Client portal</div><h1>Welcome <em>back.</em></h1><p class="small">Sign in to your secure client portal. This environment is for testing until the clinic says otherwise.</p>' +
       (state.err ? '<div class="err" role="alert">' + esc(state.err) + '</div>' : '') +
       '<form id="login"><div class="field"><label for="email">Email</label><input class="input" id="email" type="email" autocomplete="username" required value="' + esc(state.email) + '"></div><div class="field"><label for="pass">Password</label><input class="input" id="pass" type="password" autocomplete="current-password" required></div><button class="cta cta-solid" type="submit" style="margin-top:18px">Sign in</button></form><p class="small" style="margin-top:16px"><a href="/auth/reset.html">Forgot password?</a></p><p class="small">Staff use a separate sign-in that is not linked from the public site.</p></div></div></div>';
   }
