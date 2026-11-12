@@ -3,6 +3,8 @@
 
 begin;
 
+select set_config('bloom.code_pepper', 'rehearsal-pepper-not-a-secret', true);
+
 insert into private.portal_access (email, full_name, portal, staff_role, status, date_added)
 select lower(u.email), p.first_name || ' ' || p.last_name,
   case when p.portal_role = 'client' then 'client' else 'staff' end,
@@ -19,6 +21,12 @@ insert into auth.sessions (id, user_id) values
   ('dddddddd-dddd-4ddd-8ddd-ddddddddddd5', '11111111-1111-4111-8111-111111111005'),
   ('dddddddd-dddd-4ddd-8ddd-ddddddddddd1', '11111111-1111-4111-8111-111111111001')
 on conflict (id) do nothing;
+
+insert into private.sign_in_code_passes (session_id, user_id) values
+  ('dddddddd-dddd-4ddd-8ddd-ddddddddddd2', '11111111-1111-4111-8111-111111111002'),
+  ('dddddddd-dddd-4ddd-8ddd-ddddddddddd5', '11111111-1111-4111-8111-111111111005'),
+  ('dddddddd-dddd-4ddd-8ddd-ddddddddddd1', '11111111-1111-4111-8111-111111111001')
+on conflict (session_id) do nothing;
 
 insert into public.generated_documents (id, patient_id, template_name, storage_path, created_by)
 values (
@@ -75,9 +83,13 @@ begin
   ) then
     raise exception 'the send was not audited with the recipient';
   end if;
-  opened := public.redeem_requisition_link('token-hash-one');
-  if opened ->> 'status' is distinct from 'ok' or (opened ->> 'ttl_seconds')::int > 900 then
-    raise exception 'redeem did not return a short storage url: %', opened;
+  perform public.request_secure_link_code('token-hash-one', '123456');
+  opened := public.confirm_requisition_code('token-hash-one', '123456');
+  if opened ->> 'status' is distinct from 'ok' or (opened ->> 'ttl_seconds')::int > 120 then
+    raise exception 'code did not open a two-minute storage url: %', opened;
+  end if;
+  if (select confirmed_at from public.secure_links where token_hash = 'token-hash-one') is null then
+    raise exception 'confirmed_at was not set';
   end if;
   if not exists (
     select 1 from audit.events
@@ -85,7 +97,11 @@ begin
   ) then
     raise exception 'the open was not audited';
   end if;
-  raise notice 'send and open are audited';
+  opened := public.confirm_requisition_code('token-hash-one', '123456');
+  if opened ->> 'status' is distinct from 'rejected' then
+    raise exception 'a used code was accepted again';
+  end if;
+  raise notice 'send, code, and single use are audited';
 end $$;
 
 select set_config('request.jwt.claim.sub', '11111111-1111-4111-8111-111111111002', true);
@@ -102,8 +118,8 @@ do $$
 declare
   opened jsonb;
 begin
-  opened := public.redeem_requisition_link('token-hash-one');
-  if opened ->> 'status' is distinct from 'revoked' then
+  opened := public.confirm_requisition_code('token-hash-one', '000000');
+  if opened ->> 'status' is distinct from 'invalid' then
     raise exception 'revoked link still opened';
   end if;
   raise notice 'revoked link stays closed';
