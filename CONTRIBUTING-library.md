@@ -16,7 +16,8 @@ In the body:
 - A title, a short excerpt, and “Written by the Bloom care team”.
 - The article text. Teach general information. Do not give a personal plan. Herbs, food, and habits use “may support”. Do not say they cure, treat, prevent, or guarantee a result. Do not name a supplement brand or a prescription drug.
 - Food ideas stay plant-based. Do not mention meat, fish, dairy, eggs, honey, gelatin, or bone broth, and do not mention veganism.
-- Cite Canada’s Food Guide, Health Canada, or MyHealth.Alberta.ca when you state a fact.
+- Keep facts aligned with current Canadian guidance on food, natural health products, and safety, and with Nurse Practitioner scope of practice. Do not name Health Canada, Alberta Health Services, MyHealth.Alberta.ca, Canada’s Food Guide, the Government of Canada, the Public Health Agency of Canada, or another government body. Do not quote them, closely paraphrase their pages, or write that a government body recommends, says, or notes something. Restate the fact in Bloom’s own words. A rare phrase such as “current guidance” is enough when you are repeating a published number, such as a caffeine maximum.
+- Do not add a Sources or References section, and do not link to a government site. When a fact comes from a public page, add it to `library/SOURCES-internal.md` before you publish: article slug, source name, URL, and the fact it supports. That file is for the care team. It is not a patient page. Do not link it from `index.html`, an article, the footer, or the library search. The rebuild script below only reads `library/*.html`, and it skips any file whose name starts with `SOURCES`.
 - Keep the “Please read” note: educational only, not medical advice, talk to a provider, call 911 in an emergency.
 - At most one service mention. The closing “If you would like to explore care” block, with the link to `/#waitlist`, is that mention. Do not add a second booking pitch.
 
@@ -72,6 +73,9 @@ class TextExtractor(HTMLParser):
 
 index = {}
 for path in sorted(Path("library").glob("*.html")):
+    # SOURCES-internal.md is care-team notes, not an article. Never index it.
+    if path.name.lower().startswith("sources"):
+        continue
     html = path.read_text()
     match = re.search(r'<div class="article-body">(.*)</div>\s*</article>', html, re.S)
     parser = TextExtractor()
@@ -89,3 +93,5 @@ The key must be `/library/<slug>.html`. The library search on `index.html` loads
 ## 5. Check before you publish
 
 Open the article and `index.html#library`. Confirm the card image, the category filter, and a search for a word that appears only in the body. Read the article once against the notes in step 1.
+
+Search the new article for Health Canada, MyHealth, Alberta Health Services, Canada’s Food Guide, Government of Canada, Public Health Agency, and `canada.ca`. None of those should appear in the public page. Confirm `library/SOURCES-internal.md` lists the sources you used, and that the site does not link to that file.
