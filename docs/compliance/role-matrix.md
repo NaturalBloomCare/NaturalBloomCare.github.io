@@ -19,3 +19,5 @@ The owner’s workspace blanks date of birth, email, phone, address and the heal
 Reads of a client record, a requisition, or a document call `public.note_staff_view`, which appends an audit row. Staff cannot update or delete `audit.events`.
 
 The health number is collected for requisitions. The PDF copy stores the last four digits. The full number stays in `private.patient_identifiers` until `reveal_phn`, which requires `patients.reveal_ahc` (administration and the NP) and a reason.
+
+Every role, including the owner, must pass the emailed sign-in code before `private.portal_role()`, `private.assurance_ok()`, or `private.profile_active()` returns a usable result. Staff still need an authenticator after that code. An invited staff member can receive the code and becomes active only after the code and the authenticator. An invited client does not.

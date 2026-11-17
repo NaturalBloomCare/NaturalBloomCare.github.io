@@ -18,10 +18,16 @@ Apply these files in this order, in the Supabase SQL editor or with `supabase db
 14. `supabase/migrations/20261111181300_portal_access_list.sql`
 15. `supabase/migrations/20261111181400_requisition_email_links.sql`
 16. `supabase/migrations/20261111181500_role_matrix_and_read_audit.sql`
+17. `supabase/migrations/20261111181600_email_codes.sql`
+18. `supabase/migrations/20261111181700_email_code_review.sql`
 
 Migrations 1–14 are the files through the access list. Migrations 15 and 16 are not applied to the live project yet. Review them before applying. They do not create users. After the access-list migration is applied, turn the custom access token hook on and set a short JWT expiry. Clover then syncs the sheet with `private.apply_access_list` using the service role. The seed file no longer contains a sign-in secret. Migration 8 is what replaced the live passwords.
 
 `supabase/scripts/go_live_cleanup.sql` is not a migration. It refuses to run unless `bloom.confirm_go_live` is `yes`, and the copy in the repository ends in `rollback`. Use it only before any real record exists, to delete `@example.com` accounts and rows marked testing.
+
+Migrations 17 and 18 are not applied to the live project yet. Migration 17 makes a requisition link send a one-time code before the file opens, and it makes both portals require an emailed sign-in code after the password. Migration 18 stores those codes as an HMAC. The pepper is the Vault secret named `code_pepper`. It is not in this repository. Create it in the SQL editor with `vault.create_secret`, using a long random value, before relying on the codes. A missing pepper fails closed. The local rehearsal sets `bloom.code_pepper` inside a rolled-back test and does not use that value in production.
+
+Those codes are sent by the pluggable email provider (`EMAIL_PROVIDER`, `EMAIL_API_KEY`, `EMAIL_FROM`), not by Supabase Auth’s built-in mailer. If those secrets are missing, the send fails closed and nothing is opened. Password-reset mail still uses whatever SMTP is configured for Supabase Auth. The built-in Auth mailer is best-effort, its hourly quota can change without notice, and a custom SMTP server starts at 30 messages an hour until that limit is raised. That is too small for a code on every sign-in, so sign-in codes and requisition codes do not use it. Postmark is the provider the clinic is considering. It is not set up yet. Redeploy `open-secure-link` and `send-sign-in-code` after the migrations. The signed address after a correct requisition code lasts at most two minutes.
 
 Then deploy the Edge Functions:
 

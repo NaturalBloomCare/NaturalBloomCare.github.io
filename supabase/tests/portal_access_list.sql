@@ -239,9 +239,15 @@ update public.profiles
 set status = 'active', portal_role = 'owner'
 where id = '11111111-1111-4111-8111-111111111001';
 select set_config('request.jwt.claim.sub', '11111111-1111-4111-8111-111111111001', true);
+insert into auth.sessions (id, user_id) values
+  ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1', '11111111-1111-4111-8111-111111111001')
+on conflict (id) do nothing;
+insert into private.sign_in_code_passes (session_id, user_id) values
+  ('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1', '11111111-1111-4111-8111-111111111001')
+on conflict (session_id) do nothing;
 select set_config(
   'request.jwt.claims',
-  '{"app_metadata":{"portal_role":"owner"}}',
+  '{"session_id":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1","app_metadata":{"portal_role":"owner"}}',
   true
 );
 do $$

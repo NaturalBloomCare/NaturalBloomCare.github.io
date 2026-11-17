@@ -5,6 +5,8 @@
 
 begin;
 
+select set_config('bloom.code_pepper', 'rehearsal-pepper-not-a-secret', true);
+
 insert into private.portal_access (email, full_name, portal, staff_role, status, date_added)
 select lower(u.email), p.first_name || ' ' || p.last_name,
   case when p.portal_role = 'client' then 'client' else 'staff' end,
@@ -94,6 +96,12 @@ insert into auth.sessions (id, user_id) values
   ('cccccccc-cccc-4ccc-8ccc-cccccccccc02', '22222222-2222-4222-8222-222222222002'),
   ('cccccccc-cccc-4ccc-8ccc-cccccccccc03', '11111111-1111-4111-8111-111111111003')
 on conflict (id) do nothing;
+
+insert into private.sign_in_code_passes (session_id, user_id) values
+  ('cccccccc-cccc-4ccc-8ccc-cccccccccc01', '22222222-2222-4222-8222-222222222001'),
+  ('cccccccc-cccc-4ccc-8ccc-cccccccccc02', '22222222-2222-4222-8222-222222222002'),
+  ('cccccccc-cccc-4ccc-8ccc-cccccccccc03', '11111111-1111-4111-8111-111111111003')
+on conflict (session_id) do nothing;
 
 set role authenticated;
 do $$
@@ -210,6 +218,17 @@ exception
     end if;
 end $$;
 reset role;
+
+-- The medical sample account is Amelia's NP in the current data. Pin both
+-- assignments here so the draft path and the unassigned-patient denial do
+-- not depend on whatever the database currently stores.
+update public.patients
+set np_profile_id = '11111111-1111-4111-8111-111111111003'
+where legacy_id = 'BLM-100231';
+update public.patients
+set np_profile_id = '11111111-1111-4111-8111-111111111004',
+    hns_profile_id = '11111111-1111-4111-8111-111111111005'
+where legacy_id = 'BLM-100244';
 
 select set_config('request.jwt.claim.sub', '11111111-1111-4111-8111-111111111003', true);
 select set_config(

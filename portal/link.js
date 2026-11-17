@@ -11,11 +11,7 @@
       body: JSON.stringify(body)
     }).then(function(r){ return r.json(); });
   }
-  say('Opening the document…');
-  call({ token: token, action: 'open' }).then(function(j){
-    if(j.url){ say('Opening the document. This address works only for a short time. The clinic can turn the link off.'); location.href = j.url; }
-    else say(j.message || 'This link is not valid.');
-  }).catch(function(){ say('The document could not be opened.'); });
+  say('Request a code. It is sent to the same address as this link and works once, for about 10 minutes.');
   var ask = document.getElementById('ask');
   if(ask) ask.addEventListener('click', function(){
     say('Sending a code…');

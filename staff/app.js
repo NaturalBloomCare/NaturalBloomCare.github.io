@@ -1925,6 +1925,9 @@ function deniedPage(u, hash, reason){
 function enrollScreen(){
   return '<div class="auth"><div class="auth-art" role="img" aria-label="Lilac petals"><div class="cap"><div class="t">A second step, for privacy</div><div class="s">Required for staff</div></div></div><div class="neo auth-card"><a class="brand logo-link" href="#/signin"><img class="bloom-mark" src="/assets/logo/bloom-logo-animated-hover-dark.svg" alt="Bloom Integrative Health"></a><div class="eyebrow" style="margin-top:26px">Set up MFA</div><h1>Scan this <em>code.</em></h1><p class="small" style="margin-top:10px">Staff must use an authenticator app before the portal opens. Clients are not asked to do this here.</p>'+(auth.qr?'<img alt="Authenticator QR code" src="'+esc(auth.qr)+'" style="width:180px;height:180px;margin-top:12px">':'')+(auth.err?'<div class="err" role="alert">'+esc(auth.err)+'</div>':'')+'<form class="form" data-form="enroll"><div class="field"><label for="enroll-code">Six-digit code</label><input class="input" id="enroll-code" inputmode="numeric" autocomplete="one-time-code" required></div><button class="cta cta-solid" type="submit">Enable and continue</button></form></div></div>';
 }
+function emailCodeScreen(){
+  return '<div class="auth"><div class="auth-art" role="img" aria-label="Lilac petals"><div class="cap"><div class="t">Check your email</div><div class="s">Before the authenticator</div></div></div><div class="neo auth-card"><a class="brand logo-link" href="#/signin"><img class="bloom-mark" src="/assets/logo/bloom-logo-animated-hover-dark.svg" alt="Bloom Integrative Health"></a><div class="eyebrow" style="margin-top:26px">Staff portal</div><h1>Enter your <em>email code.</em></h1><p class="small" style="margin-top:10px">A six-digit code was sent to your account email. It works once and expires in about 10 minutes. Your authenticator comes next.</p><form class="form" data-form="email-code">'+(auth.err?'<div class="err" role="alert">'+esc(auth.err)+'</div>':'')+'<div class="field"><label for="email-code">Six-digit code</label><input class="input" id="email-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required></div><button class="cta cta-solid tap-target" type="submit">Continue</button></form><p class="tiny" style="margin-top:14px"><button class="link tap-target" type="button" id="resend-email-code">Resend code</button></p></div></div>';
+}
 function loginScreen(){
     return '<div class="auth"><div class="auth-art" role="img" aria-label="Lilac petals"><div class="cap"><div class="t">Where health takes root</div><div class="s">Bloom · Staff portal</div></div></div><div class="neo auth-card"><a class="brand logo-link" href="#/signin"><img class="bloom-mark" src="/assets/logo/bloom-logo-animated-hover-dark.svg" alt="Bloom Integrative Health"></a><div class="eyebrow" style="margin-top:26px">Staff portal</div><h1>Welcome <em>back.</em></h1><p class="small" style="margin-top:10px">One sign-in for owners, admins and practitioners. You will be taken to the portal your role allows.</p>'+
     '<form class="form" data-form="login">'+(auth.err?'<div class="err" role="alert">'+esc(auth.err)+'</div>':'')+'<div class="field"><label for="li-email">Work email</label><input class="input" id="li-email" type="email" autocomplete="username" value="'+esc(auth.email)+'" placeholder="name@bloom.example" required></div><div class="field"><label for="li-pass">Password</label><input class="input" id="li-pass" type="password" autocomplete="current-password" placeholder="Your password" required></div><button class="cta cta-solid" type="submit" style="margin-top:6px">Continue '+icon('arrow',14)+'</button><p class="tiny">For authorized Bloom staff only. Every sign-in and record you open is recorded and audited under Alberta’s Health Information Act.</p></form>'+
@@ -2005,7 +2008,7 @@ function render(){
   const hash = location.hash || '';
   if(hash==='#/blueprint'){ app.innerHTML = blueprintScreen(); window.scrollTo(0,0); return; }
   if(!session){
-    app.innerHTML = auth.step==='mfa' ? mfaScreen() : auth.step==='enroll' ? enrollScreen() : auth.step==='pledge' ? pledgeScreen() : loginScreen();
+    app.innerHTML = auth.step==='mfa' ? mfaScreen() : auth.step==='enroll' ? enrollScreen() : auth.step==='pledge' ? pledgeScreen() : auth.step==='email-code' ? emailCodeScreen() : loginScreen();
     const f = document.getElementById(auth.step==='mfa'?'mfa-0':(auth.email?'li-pass':'li-email')); if(f) f.focus({ preventScroll:true });
     return;
   }
@@ -2250,11 +2253,25 @@ document.addEventListener('input', e => {
 document.addEventListener('paste', e => {
   if(e.target.dataset && e.target.dataset.mfa!=null){ const d = (e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,6); if(d.length){ e.preventDefault(); d.split('').forEach((c,i) => { const n = document.getElementById('mfa-'+i); if(n) n.value=c; }); } }
 });
+document.addEventListener('click', e => {
+  if(e.target && e.target.id==='resend-email-code'){
+    if(auth.resendAt && Date.now() < auth.resendAt){ auth.err = 'Please wait a minute and try again.'; render(); return; }
+    auth.resendAt = Date.now() + 60000;
+    auth.err = '';
+    BloomAuth.resendEmailCode();
+  }
+});
 document.addEventListener('submit', e => {
   const f = e.target.dataset.form; if(!f) return; e.preventDefault();
   if(f==='login'){
     auth.email = document.getElementById('li-email').value.trim().toLowerCase();
     BloomAuth.password(auth.email, document.getElementById('li-pass').value);
+    return;
+  }
+  if(f==='email-code'){
+    const code = (document.getElementById('email-code').value || '').replace(/\D/g,'').slice(0,6);
+    if(!/^\d{6}$/.test(code)){ auth.err = 'That code was not accepted.'; render(); return; }
+    BloomAuth.emailCode(code);
     return;
   }
   if(f==='mfa'){

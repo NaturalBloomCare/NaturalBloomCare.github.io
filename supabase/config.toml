@@ -11,3 +11,6 @@ verify_jwt = true
 [functions.open-secure-link]
 # The recipient is not signed in. The function checks a stored token itself.
 verify_jwt = false
+
+[functions.send-sign-in-code]
+verify_jwt = true

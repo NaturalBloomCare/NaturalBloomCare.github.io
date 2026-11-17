@@ -19,6 +19,11 @@ insert into auth.sessions (id, user_id) values
   ('cccccccc-cccc-4ccc-8ccc-ccccccccccc4', '11111111-1111-4111-8111-111111111004')
 on conflict (id) do nothing;
 
+insert into private.sign_in_code_passes (session_id, user_id) values
+  ('cccccccc-cccc-4ccc-8ccc-ccccccccccc5', '11111111-1111-4111-8111-111111111005'),
+  ('cccccccc-cccc-4ccc-8ccc-ccccccccccc4', '11111111-1111-4111-8111-111111111004')
+on conflict (session_id) do nothing;
+
 -- B1: a client must not be able to change her own portal_role.
 select set_config('request.jwt.claim.sub', '22222222-2222-4222-8222-222222222001', true);
 set role authenticated;
